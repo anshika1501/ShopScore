@@ -1,0 +1,76 @@
+# ShopScore - Development Roadmap & Task Tracker
+
+This file tracks the stage-by-stage implementation of the ShopScore store rating platform as specified in `AGENTS.md`.
+
+---
+
+## Stages Overview
+
+- [x] **Stage 1: Infrastructure & Environment Setup**
+  - [x] Create `.gitignore` to protect sensitive files and ignore build artifacts
+  - [x] Configure root `docker-compose.yml` for PostgreSQL 16 with persistent named volume
+  - [x] Define Docker Compose `.env.example` in project root
+  - [x] Define backend environment template `backend/.env.example`
+  - [x] Update `README.md` with complete WSL + Docker workflow and container commands
+  - [x] Commit Stage 1 changes
+
+- [ ] **Stage 2: Database Schema & Entity Relationships**
+  - [ ] Initialize backend package structure and install Prisma & dependencies
+  - [ ] Finalize Prisma schema (`User`, `Store`, `Rating`, `Role` enum) respecting 1:N owner cardinality and composite unique `(userId, storeId)`
+  - [ ] Verify PostgreSQL container health before migrations
+  - [ ] Run initial Prisma migration (`init`)
+  - [ ] Implement seed script (`backend/prisma/seed.ts`) with initial Admin and demo data
+  - [ ] Verify database schema and seed data in PostgreSQL
+  - [ ] Commit Stage 2 changes
+
+- [ ] **Stage 3: Backend Foundation & Authentication System**
+  - [ ] Configure Express server with security headers, CORS, body parser, and centralized error handling
+  - [ ] Implement Zod validation schemas for registration, login, and password changes
+  - [ ] Implement password hashing with bcrypt
+  - [ ] Implement JWT generation, cookie/bearer token handling, and auth middleware (`requireAuth`, `requireRole`)
+  - [ ] Implement Auth routes: `/api/auth/register` (normal users only), `/api/auth/login`, `/api/auth/me`, `/api/auth/change-password`
+  - [ ] Add automated tests for auth and validation boundaries
+  - [ ] Commit Stage 3 changes
+
+- [ ] **Stage 4: Admin Management APIs**
+  - [ ] Implement Admin Dashboard statistics endpoint (`/api/admin/dashboard`)
+  - [ ] Implement Admin User Management: list users with search, role filter, sorting, and pagination
+  - [ ] Implement Admin User Creation: create `ADMIN` and `STORE_OWNER` accounts
+  - [ ] Implement Admin Store Management: create store and associate with a `STORE_OWNER`
+  - [ ] Implement Admin User Details endpoint (including store rating summaries for store owners)
+  - [ ] Add tests for Admin authorization guards and listing filters
+  - [ ] Commit Stage 4 changes
+
+- [ ] **Stage 5: Store Browsing, Rating & Store Owner APIs**
+  - [ ] Implement Public/User Store Listing (`/api/stores`) with name/address search, sorting, and rating aggregates
+  - [ ] Implement User Rating endpoints (`/api/ratings`): create or update (upsert) 1-5 rating per user-store
+  - [ ] Implement Store Owner APIs (`/api/owner/stores`, `/api/owner/ratings`) with strict store data isolation
+  - [ ] Add tests for rating boundaries (1-5), duplicate rating updates, and store-owner isolation
+  - [ ] Commit Stage 5 changes
+
+- [ ] **Stage 6: Frontend Foundation & Shared Authentication UI**
+  - [ ] Initialize React + Vite frontend with Tailwind CSS and React Router
+  - [ ] Configure Axios API client with centralized error and auth handling
+  - [ ] Build shared Auth Context, route guards (`ProtectedRoute`, `RoleRoute`)
+  - [ ] Build shared navigation and responsive layout
+  - [ ] Build Login, Public Registration, and Change Password pages
+  - [ ] Commit Stage 6 changes
+
+- [ ] **Stage 7: Normal User Experience**
+  - [ ] Build Store Discovery page with live search (name/address) and sorting
+  - [ ] Build interactive 1-5 star Rating submission and modification modal/component
+  - [ ] Display overall store rating and user's submitted rating ("Not rated" fallback)
+  - [ ] Commit Stage 7 changes
+
+- [ ] **Stage 8: Administrator & Store Owner Portals**
+  - [ ] Build Admin Dashboard with platform stat counters
+  - [ ] Build Admin User Management view with search, filter by role, column sort, pagination, and user creation form
+  - [ ] Build Admin Store Management view with store creation and store owner assignment
+  - [ ] Build Store Owner Dashboard showing owned store(s) average ratings and customer rating details
+  - [ ] Commit Stage 8 changes
+
+- [ ] **Stage 9: End-to-End Verification & Final Polish**
+  - [ ] Run full test suite across auth, roles, ratings, and store owner data isolation
+  - [ ] Verify production build for backend and frontend
+  - [ ] Finalize documentation and verify setup steps from scratch
+  - [ ] Commit Stage 9 changes

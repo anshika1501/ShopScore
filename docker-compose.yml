@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: shopscore_postgres
+    restart: unless-stopped
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-shopscore}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-shopscore_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-shopscore_dev}
+    volumes:
+      - shopscore_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-shopscore} -d ${POSTGRES_DB:-shopscore_dev}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  shopscore_postgres_data:
+    name: shopscore_postgres_data
