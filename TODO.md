@@ -14,14 +14,13 @@ This file tracks the stage-by-stage implementation of the ShopScore store rating
   - [x] Update `README.md` with complete WSL + Docker workflow and container commands
   - [x] Commit Stage 1 changes
 
-- [ ] **Stage 2: Database Schema & Entity Relationships**
-  - [ ] Initialize backend package structure and install Prisma & dependencies
-  - [ ] Finalize Prisma schema (`User`, `Store`, `Rating`, `Role` enum) respecting 1:N owner cardinality and composite unique `(userId, storeId)`
-  - [ ] Verify PostgreSQL container health before migrations
-  - [ ] Run initial Prisma migration (`init`)
-  - [ ] Implement seed script (`backend/prisma/seed.ts`) with initial Admin and demo data
-  - [ ] Verify database schema and seed data in PostgreSQL
-  - [ ] Commit Stage 2 changes
+- [x] **Stage 2: Database Schema & Entity Relationships**
+  - [x] Initialize backend package structure and install Prisma & dependencies
+  - [x] Finalize Prisma schema (`User`, `Store`, `Rating`, `Role` enum) respecting 1:N owner cardinality and composite unique `(userId, storeId)`
+  - [x] Add automated DB connectivity check utility (`npm run db:check`)
+  - [x] Generate Prisma client bindings and prepare initial migration SQL (`20261004000000_init`)
+  - [x] Implement seed script (`backend/prisma/seed.ts`) with initial Admin and demo data
+  - [x] Commit Stage 2 changes
 
 - [ ] **Stage 3: Backend Foundation & Authentication System**
   - [ ] Configure Express server with security headers, CORS, body parser, and centralized error handling
