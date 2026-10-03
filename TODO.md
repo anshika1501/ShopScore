@@ -22,14 +22,14 @@ This file tracks the stage-by-stage implementation of the ShopScore store rating
   - [x] Implement seed script (`backend/prisma/seed.ts`) with initial Admin and demo data
   - [x] Commit Stage 2 changes
 
-- [ ] **Stage 3: Backend Foundation & Authentication System**
-  - [ ] Configure Express server with security headers, CORS, body parser, and centralized error handling
-  - [ ] Implement Zod validation schemas for registration, login, and password changes
-  - [ ] Implement password hashing with bcrypt
-  - [ ] Implement JWT generation, cookie/bearer token handling, and auth middleware (`requireAuth`, `requireRole`)
-  - [ ] Implement Auth routes: `/api/auth/register` (normal users only), `/api/auth/login`, `/api/auth/me`, `/api/auth/change-password`
-  - [ ] Add automated tests for auth and validation boundaries
-  - [ ] Commit Stage 3 changes
+- [x] **Stage 3: Backend Foundation & Authentication System**
+  - [x] Configure Express server with security headers (Helmet), CORS, body parser with limits, and centralized error handling
+  - [x] Implement Zod validation schemas for registration, login, and password changes
+  - [x] Implement password hashing with bcrypt
+  - [x] Implement JWT generation, cookie/bearer token handling, and auth middleware (`requireAuth`, `requireRole`)
+  - [x] Implement Auth routes: `/api/auth/register` (strictly normal users only), `/api/auth/login`, `/api/auth/me`, `/api/auth/change-password`, `/api/auth/logout`
+  - [x] Add automated unit and integration tests (17 tests passing across validation, JWT, and API boundaries)
+  - [x] Commit Stage 3 changes
 
 - [ ] **Stage 4: Admin Management APIs**
   - [ ] Implement Admin Dashboard statistics endpoint (`/api/admin/dashboard`)
