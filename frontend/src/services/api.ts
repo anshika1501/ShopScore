@@ -111,6 +111,21 @@ export const adminApi = {
     const res = await api.post<ApiResponse<{ store: Store }>>('/admin/stores', payload);
     return res.data;
   },
+
+  deleteUser: async (id: string) => {
+    const res = await api.delete<ApiResponse<null>>(`/admin/users/${id}`);
+    return res.data;
+  },
+
+  deleteStore: async (id: string) => {
+    const res = await api.delete<ApiResponse<null>>(`/admin/stores/${id}`);
+    return res.data;
+  },
+
+  deleteRating: async (id: string) => {
+    const res = await api.delete<ApiResponse<{ storeId: string; totalRatings: number; overallRating: number | null }>>(`/admin/ratings/${id}`);
+    return res.data;
+  },
 };
 
 export const ownerApi = {

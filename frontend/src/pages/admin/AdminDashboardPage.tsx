@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { adminApi } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 import { User, Store, Pagination } from '../../types';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import { Alert } from '../../components/common/Alert';
+import { ConfirmationModal } from '../../components/common/ConfirmationModal';
 import { CreateUserModal } from '../../components/admin/CreateUserModal';
 import { CreateStoreModal } from '../../components/admin/CreateStoreModal';
 import { UserDetailsModal } from '../../components/admin/UserDetailsModal';
@@ -15,11 +17,13 @@ import {
   Search,
   Filter,
   Eye,
+  Trash2,
   ArrowUpDown,
   Building2,
 } from 'lucide-react';
 
 export const AdminDashboardPage: React.FC = () => {
+  const { user: currentUser } = useAuth();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'stores'>('overview');
 
@@ -59,6 +63,11 @@ export const AdminDashboardPage: React.FC = () => {
   const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+
+  // Deletion modals state
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [storeToDelete, setStoreToDelete] = useState<Store | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
 
   // Global loading and error
   const [loading, setLoading] = useState(true);
@@ -141,6 +150,40 @@ export const AdminDashboardPage: React.FC = () => {
   const triggerToast = (msg: string) => {
     setSuccessToast(msg);
     setTimeout(() => setSuccessToast(null), 4000);
+  };
+
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+    setActionLoading(true);
+    setError(null);
+    try {
+      const res = await adminApi.deleteUser(userToDelete.id);
+      triggerToast(res.message || `User "${userToDelete.name}" was successfully deleted.`);
+      setUserToDelete(null);
+      await Promise.all([fetchStats(), fetchUsers(), fetchStoreOwners()]);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to delete user account.');
+      setUserToDelete(null);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleDeleteStore = async () => {
+    if (!storeToDelete) return;
+    setActionLoading(true);
+    setError(null);
+    try {
+      const res = await adminApi.deleteStore(storeToDelete.id);
+      triggerToast(res.message || `Store "${storeToDelete.name}" was successfully deleted.`);
+      setStoreToDelete(null);
+      await Promise.all([fetchStats(), fetchStores(), fetchUsers()]);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to delete store.');
+      setStoreToDelete(null);
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   return (
@@ -407,14 +450,26 @@ export const AdminDashboardPage: React.FC = () => {
                           </td>
                           <td className="px-6 py-4 text-gray-500 max-w-xs truncate">{u.address || '—'}</td>
                           <td className="px-6 py-4 text-right">
-                            <button
-                              onClick={() => handleOpenUserDetails(u.id)}
-                              className="inline-flex items-center text-xs font-semibold text-purple-600 hover:text-purple-800 p-1.5 hover:bg-purple-50 rounded-lg transition"
-                              title="View User Details"
-                            >
-                              <Eye className="w-4 h-4 mr-1" />
-                              Details
-                            </button>
+                            <div className="flex items-center justify-end space-x-2">
+                              <button
+                                onClick={() => handleOpenUserDetails(u.id)}
+                                className="inline-flex items-center text-xs font-semibold text-purple-600 hover:text-purple-800 p-1.5 hover:bg-purple-50 rounded-lg transition"
+                                title="View User Details"
+                              >
+                                <Eye className="w-4 h-4 mr-1" />
+                                Details
+                              </button>
+                              {u.id !== currentUser?.id && (
+                                <button
+                                  onClick={() => setUserToDelete(u)}
+                                  className="inline-flex items-center text-xs font-semibold text-red-600 hover:text-red-800 p-1.5 hover:bg-red-50 rounded-lg transition"
+                                  title="Delete User Account"
+                                >
+                                  <Trash2 className="w-4 h-4 mr-1" />
+                                  Delete
+                                </button>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       ))
@@ -503,12 +558,13 @@ export const AdminDashboardPage: React.FC = () => {
                       <th className="px-6 py-3">Address</th>
                       <th className="px-6 py-3">Owner</th>
                       <th className="px-6 py-3">Overall Rating</th>
+                      <th className="px-6 py-3 text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {stores.length === 0 ? (
                       <tr>
-                        <td colSpan={5} className="text-center py-8 text-gray-500">
+                        <td colSpan={6} className="text-center py-8 text-gray-500">
                           No stores registered or matching search.
                         </td>
                       </tr>
@@ -534,6 +590,16 @@ export const AdminDashboardPage: React.FC = () => {
                             ) : (
                               <span className="text-xs text-gray-400 font-medium">Not rated</span>
                             )}
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <button
+                              onClick={() => setStoreToDelete(s)}
+                              className="inline-flex items-center text-xs font-semibold text-red-600 hover:text-red-800 p-1.5 hover:bg-red-50 rounded-lg transition"
+                              title="Delete Store"
+                            >
+                              <Trash2 className="w-4 h-4 mr-1" />
+                              Delete
+                            </button>
                           </td>
                         </tr>
                       ))
@@ -606,6 +672,35 @@ export const AdminDashboardPage: React.FC = () => {
           setIsDetailsModalOpen(false);
           setSelectedUserId(null);
         }}
+        onRatingDeleted={() => {
+          fetchStats();
+          fetchStores();
+          triggerToast('Rating was successfully deleted and store metrics recalculated.');
+        }}
+      />
+
+      {/* Confirmation Modal for User Deletion */}
+      <ConfirmationModal
+        isOpen={!!userToDelete}
+        title="Delete User Account"
+        message={`Are you sure you want to delete "${userToDelete?.name}" (${userToDelete?.email})? This action will permanently remove the account and unlink any associated store records.`}
+        confirmText="Delete Account"
+        isDestructive={true}
+        loading={actionLoading}
+        onConfirm={handleDeleteUser}
+        onCancel={() => setUserToDelete(null)}
+      />
+
+      {/* Confirmation Modal for Store Deletion */}
+      <ConfirmationModal
+        isOpen={!!storeToDelete}
+        title="Delete Store"
+        message={`Are you sure you want to delete "${storeToDelete?.name}"? All associated ratings and reviews will be permanently removed, and the store will be unlisted from public view.`}
+        confirmText="Delete Store"
+        isDestructive={true}
+        loading={actionLoading}
+        onConfirm={handleDeleteStore}
+        onCancel={() => setStoreToDelete(null)}
       />
     </div>
   );

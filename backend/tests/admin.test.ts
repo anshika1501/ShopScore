@@ -72,6 +72,67 @@ describe('Admin Schemas and Authorization Tests', () => {
       assert.strictEqual(res.status, 403);
       assert.strictEqual(res.body.success, false);
     });
+
+    test('DELETE /api/admin/users/:id without admin role returns 403 Forbidden', async () => {
+      const userToken = signToken({
+        id: 'regular-user-id',
+        email: 'user@example.com',
+        role: Role.USER,
+      });
+
+      const res = await request(app)
+        .delete('/api/admin/users/target-user-id')
+        .set('Authorization', `Bearer ${userToken}`);
+
+      assert.strictEqual(res.status, 403);
+      assert.strictEqual(res.body.success, false);
+    });
+
+    test('DELETE /api/admin/stores/:id without admin role returns 403 Forbidden', async () => {
+      const userToken = signToken({
+        id: 'regular-user-id',
+        email: 'user@example.com',
+        role: Role.USER,
+      });
+
+      const res = await request(app)
+        .delete('/api/admin/stores/target-store-id')
+        .set('Authorization', `Bearer ${userToken}`);
+
+      assert.strictEqual(res.status, 403);
+      assert.strictEqual(res.body.success, false);
+    });
+
+    test('DELETE /api/admin/ratings/:id without admin role returns 403 Forbidden', async () => {
+      const userToken = signToken({
+        id: 'regular-user-id',
+        email: 'user@example.com',
+        role: Role.USER,
+      });
+
+      const res = await request(app)
+        .delete('/api/admin/ratings/target-rating-id')
+        .set('Authorization', `Bearer ${userToken}`);
+
+      assert.strictEqual(res.status, 403);
+      assert.strictEqual(res.body.success, false);
+    });
+
+    test('DELETE /api/admin/users/:id fails when admin attempts to delete own account', async () => {
+      const adminToken = signToken({
+        id: 'logged-in-admin-id',
+        email: 'admin@example.com',
+        role: Role.ADMIN,
+      });
+
+      const res = await request(app)
+        .delete('/api/admin/users/logged-in-admin-id')
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      assert.strictEqual(res.status, 400);
+      assert.strictEqual(res.body.success, false);
+      assert.ok(res.body.message.includes('cannot delete your own admin account'));
+    });
   });
 
   describe('Admin User Creation Schema', () => {

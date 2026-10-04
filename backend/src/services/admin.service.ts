@@ -154,6 +154,23 @@ export class AdminService {
             },
           },
         },
+        ratings: {
+          select: {
+            id: true,
+            rating: true,
+            createdAt: true,
+            store: {
+              select: {
+                id: true,
+                name: true,
+                address: true,
+              },
+            },
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+        },
       },
     });
 
@@ -190,6 +207,7 @@ export class AdminService {
       address: user.address,
       createdAt: user.createdAt,
       stores: storeDetails,
+      ratings: user.ratings || [],
     };
   }
 
@@ -319,6 +337,127 @@ export class AdminService {
         limit,
         total,
         totalPages: Math.ceil(total / limit) || 1,
+      },
+    };
+  }
+
+  /**
+   * Delete user account with integrity protections:
+   * - Cannot delete currently logged-in admin
+   * - Cannot delete the last remaining admin account
+   * - Safely cleans up relations using transaction
+   */
+  async deleteUser(userId: string, currentAdminId: string) {
+    if (userId === currentAdminId) {
+      throw new BadRequestError('You cannot delete your own admin account');
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        ownedStores: { select: { id: true } },
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    if (user.role === Role.ADMIN) {
+      const adminCount = await prisma.user.count({
+        where: { role: Role.ADMIN },
+      });
+      if (adminCount <= 1) {
+        throw new BadRequestError('Cannot delete the last remaining administrator account');
+      }
+    }
+
+    // Atomic transaction
+    await prisma.$transaction(async (tx) => {
+      // If store owner, unlink stores (set ownerId to null)
+      if (user.ownedStores.length > 0) {
+        await tx.store.updateMany({
+          where: { ownerId: userId },
+          data: { ownerId: null },
+        });
+      }
+
+      // Delete ratings submitted by this user (cascade will also handle this, but explicit in tx)
+      await tx.rating.deleteMany({
+        where: { userId },
+      });
+
+      // Delete the user record
+      await tx.user.delete({
+        where: { id: userId },
+      });
+    });
+
+    return { message: `User "${user.name}" was successfully deleted` };
+  }
+
+  /**
+   * Delete store and all its associated ratings in an atomic transaction
+   */
+  async deleteStore(storeId: string) {
+    const store = await prisma.store.findUnique({
+      where: { id: storeId },
+    });
+
+    if (!store) {
+      throw new NotFoundError('Store not found');
+    }
+
+    await prisma.$transaction(async (tx) => {
+      // Delete ratings associated with the store
+      await tx.rating.deleteMany({
+        where: { storeId },
+      });
+
+      // Delete the store
+      await tx.store.delete({
+        where: { id: storeId },
+      });
+    });
+
+    return { message: `Store "${store.name}" was successfully deleted` };
+  }
+
+  /**
+   * Delete a specific rating / review and return updated store stats
+   */
+  async deleteRating(ratingId: string) {
+    const rating = await prisma.rating.findUnique({
+      where: { id: ratingId },
+    });
+
+    if (!rating) {
+      throw new NotFoundError('Rating not found');
+    }
+
+    const storeId = rating.storeId;
+
+    await prisma.rating.delete({
+      where: { id: ratingId },
+    });
+
+    // Recompute store ratings stats
+    const remainingRatings = await prisma.rating.findMany({
+      where: { storeId },
+      select: { rating: true },
+    });
+
+    const count = remainingRatings.length;
+    const sum = remainingRatings.reduce((acc, curr) => acc + curr.rating, 0);
+    const overallRating = count > 0 ? Number((sum / count).toFixed(2)) : null;
+
+    return {
+      message: 'Rating was successfully deleted',
+      storeStats: {
+        storeId,
+        totalRatings: count,
+        overallRating,
+        averageRating: overallRating,
       },
     };
   }

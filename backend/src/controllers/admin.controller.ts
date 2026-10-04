@@ -77,6 +77,47 @@ export class AdminController {
       return next(error);
     }
   }
+
+  async deleteUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const currentAdminId = req.user!.id;
+      const targetUserId = req.params.id as string;
+      const result = await adminService.deleteUser(targetUserId, currentAdminId);
+      return res.status(200).json({
+        success: true,
+        message: result.message,
+      });
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async deleteStore(req: Request, res: Response, next: NextFunction) {
+    try {
+      const targetStoreId = req.params.id as string;
+      const result = await adminService.deleteStore(targetStoreId);
+      return res.status(200).json({
+        success: true,
+        message: result.message,
+      });
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async deleteRating(req: Request, res: Response, next: NextFunction) {
+    try {
+      const targetRatingId = req.params.id as string;
+      const result = await adminService.deleteRating(targetRatingId);
+      return res.status(200).json({
+        success: true,
+        message: result.message,
+        data: result.storeStats,
+      });
+    } catch (error) {
+      return next(error);
+    }
+  }
 }
 
 export const adminController = new AdminController();

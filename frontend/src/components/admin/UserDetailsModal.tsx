@@ -2,38 +2,65 @@ import React, { useState, useEffect } from 'react';
 import { adminApi } from '../../services/api';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { Alert } from '../common/Alert';
-import { X, User, Store, Star, MapPin, Mail, Calendar } from 'lucide-react';
+import { X, User, Store, Star, MapPin, Mail, Calendar, Trash2 } from 'lucide-react';
 import { formatDate } from '../../utils/formatDate';
+import { ConfirmationModal } from '../common/ConfirmationModal';
 
 interface UserDetailsModalProps {
   userId: string | null;
   isOpen: boolean;
   onClose: () => void;
+  onRatingDeleted?: () => void;
 }
 
-export const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ userId, isOpen, onClose }) => {
+export const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
+  userId,
+  isOpen,
+  onClose,
+  onRatingDeleted,
+}) => {
   const [user, setUser] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [ratingToDelete, setRatingToDelete] = useState<{ id: string; storeName: string } | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const fetchDetails = async () => {
+    if (!userId) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await adminApi.getUserDetails(userId);
+      setUser(res.data.user);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to fetch user details.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!isOpen || !userId) return;
-
-    const fetchDetails = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await adminApi.getUserDetails(userId);
-        setUser(res.data.user);
-      } catch (err: any) {
-        setError(err.response?.data?.message || 'Failed to fetch user details.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchDetails();
   }, [userId, isOpen]);
+
+  const handleDeleteRating = async () => {
+    if (!ratingToDelete) return;
+    setDeleteLoading(true);
+    try {
+      await adminApi.deleteRating(ratingToDelete.id);
+      setSuccess(`Rating for "${ratingToDelete.storeName}" was successfully removed.`);
+      setRatingToDelete(null);
+      await fetchDetails();
+      if (onRatingDeleted) onRatingDeleted();
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to delete rating.');
+      setRatingToDelete(null);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
 
   if (!isOpen || !userId) return null;
 
@@ -58,6 +85,12 @@ export const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ userId, isOp
         {error && (
           <div className="mb-4">
             <Alert type="error" message={error} onClose={() => setError(null)} />
+          </div>
+        )}
+
+        {success && (
+          <div className="mb-4">
+            <Alert type="success" message={success} onClose={() => setSuccess(null)} />
           </div>
         )}
 
@@ -143,6 +176,56 @@ export const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ userId, isOp
               </div>
             )}
 
+            {/* If user is normal USER, show submitted ratings/reviews with delete option */}
+            {user.role === 'USER' && (
+              <div>
+                <h4 className="text-sm font-bold text-gray-900 mb-3 flex items-center">
+                  <Star className="w-4 h-4 text-yellow-500 mr-2" />
+                  Submitted Ratings ({user.ratings?.length || 0})
+                </h4>
+
+                {(!user.ratings || user.ratings.length === 0) ? (
+                  <p className="text-xs text-gray-500 bg-gray-50 p-4 rounded-lg border border-dashed text-center">
+                    This user has not submitted any store ratings yet.
+                  </p>
+                ) : (
+                  <div className="space-y-3 max-h-60 overflow-y-auto pr-1">
+                    {user.ratings.map((r: any) => (
+                      <div
+                        key={r.id}
+                        className="p-3.5 bg-white border border-gray-200 rounded-lg shadow-xs flex justify-between items-center"
+                      >
+                        <div className="max-w-[65%]">
+                          <p className="text-sm font-semibold text-gray-900 truncate">
+                            {r.store?.name || 'Store'}
+                          </p>
+                          <p className="text-xs text-gray-500 truncate">{r.store?.address}</p>
+                          <p className="text-[11px] text-gray-400 mt-0.5">
+                            Submitted: {formatDate(r.createdAt)}
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <span className="inline-flex items-center text-xs font-bold text-yellow-800 bg-yellow-50 px-2.5 py-1 rounded border border-yellow-200">
+                            ★ {r.rating} / 5
+                          </span>
+                          {onRatingDeleted && (
+                            <button
+                              type="button"
+                              onClick={() => setRatingToDelete({ id: r.id, storeName: r.store?.name || 'Store' })}
+                              className="text-gray-400 hover:text-red-600 p-1.5 hover:bg-red-50 rounded-lg transition"
+                              title="Delete rating"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="pt-2">
               <button
                 type="button"
@@ -154,6 +237,18 @@ export const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ userId, isOp
             </div>
           </div>
         ) : null}
+
+        {/* Delete Rating Confirmation */}
+        <ConfirmationModal
+          isOpen={!!ratingToDelete}
+          title="Delete Rating / Review"
+          message={`Are you sure you want to delete the rating for "${ratingToDelete?.storeName}"? The store's average score will be recalculated.`}
+          confirmText="Delete Rating"
+          isDestructive={true}
+          loading={deleteLoading}
+          onConfirm={handleDeleteRating}
+          onCancel={() => setRatingToDelete(null)}
+        />
       </div>
     </div>
   );
