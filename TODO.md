@@ -62,12 +62,13 @@ This file tracks the stage-by-stage implementation of the ShopScore store rating
   - [x] Integrate pagination and toast notifications for rating updates
   - [x] Commit Stage 7 changes
 
-- [ ] **Stage 8: Administrator & Store Owner Portals**
-  - [ ] Build Admin Dashboard with platform stat counters
-  - [ ] Build Admin User Management view with search, filter by role, column sort, pagination, and user creation form
-  - [ ] Build Admin Store Management view with store creation and store owner assignment
-  - [ ] Build Store Owner Dashboard showing owned store(s) average ratings and customer rating details
-  - [ ] Commit Stage 8 changes
+- [x] **Stage 8: Administrator & Store Owner Portals**
+  - [x] Build Admin Dashboard with platform stat counters (Users, Stores, Ratings)
+  - [x] Build Admin User Management view with search, filter by role, column sort, pagination, and user creation form (`CreateUserModal.tsx`)
+  - [x] Build Admin User Details inspect view showing profile and assigned store rating performance (`UserDetailsModal.tsx`)
+  - [x] Build Admin Store Management view with store creation and store owner assignment (`CreateStoreModal.tsx`)
+  - [x] Build Store Owner Dashboard showing owned store(s) average ratings and customer rating inspection table with reviewer details
+  - [x] Commit Stage 8 changes
 
 - [ ] **Stage 9: End-to-End Verification & Final Polish**
   - [ ] Run full test suite across auth, roles, ratings, and store owner data isolation
