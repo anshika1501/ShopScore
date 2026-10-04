@@ -55,11 +55,12 @@ This file tracks the stage-by-stage implementation of the ShopScore store rating
   - [x] Build Login, Public Registration (with real-time criteria validation), and Change Password pages
   - [x] Commit Stage 6 changes
 
-- [ ] **Stage 7: Normal User Experience**
-  - [ ] Build Store Discovery page with live search (name/address) and sorting
-  - [ ] Build interactive 1-5 star Rating submission and modification modal/component
-  - [ ] Display overall store rating and user's submitted rating ("Not rated" fallback)
-  - [ ] Commit Stage 7 changes
+- [x] **Stage 7: Normal User Experience**
+  - [x] Build Store Discovery page with live search (name/address) and multi-field sorting
+  - [x] Build interactive 1-5 star Rating submission and modification modal (`RatingModal.tsx` & `StarRating.tsx`)
+  - [x] Display overall store rating, review counts, and customer's submitted rating ("Not rated" fallback)
+  - [x] Integrate pagination and toast notifications for rating updates
+  - [x] Commit Stage 7 changes
 
 - [ ] **Stage 8: Administrator & Store Owner Portals**
   - [ ] Build Admin Dashboard with platform stat counters
