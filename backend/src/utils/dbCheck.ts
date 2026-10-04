@@ -1,9 +1,21 @@
 import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
 
-// Load environment variables from backend/.env
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+// Load environment variables from global root .env
+const envPaths = [
+  path.resolve(__dirname, '../../../.env'),
+  path.resolve(process.cwd(), '.env'),
+  path.resolve(process.cwd(), '../.env'),
+];
+
+for (const envPath of envPaths) {
+  if (fs.existsSync(envPath)) {
+    dotenv.config({ path: envPath });
+    break;
+  }
+}
 
 const prisma = new PrismaClient();
 
@@ -21,8 +33,8 @@ async function checkDatabase() {
     console.error('Diagnostic error details:');
     console.error(error.message || error);
     console.log('\nTroubleshooting tips:');
-    console.log('1. Ensure your PostgreSQL container is running: docker compose ps');
-    console.log('2. Check backend/.env has the correct DATABASE_URL');
+    console.log('1. Ensure your PostgreSQL container is running: docker compose ps (or wsl docker ps)');
+    console.log('2. Check project root .env has the correct DATABASE_URL');
     console.log('3. Ensure port 5432 is mapped properly');
     process.exit(1);
   } finally {
