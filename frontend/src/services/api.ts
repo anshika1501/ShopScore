@@ -126,6 +126,11 @@ export const adminApi = {
     const res = await api.delete<ApiResponse<{ storeId: string; totalRatings: number; overallRating: number | null }>>(`/admin/ratings/${id}`);
     return res.data;
   },
+
+  resetUserPassword: async (id: string, payload?: { password?: string }) => {
+    const res = await api.post<ApiResponse<{ temporaryPassword: string; user: { id: string; name: string; email: string; role: string } }>>(`/admin/users/${id}/reset-password`, payload || {});
+    return res.data;
+  },
 };
 
 export const ownerApi = {

@@ -118,6 +118,25 @@ export class AdminController {
       return next(error);
     }
   }
+
+  async resetUserPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const targetUserId = req.params.id as string;
+      const { password } = req.body || {};
+      const result = await adminService.resetUserPassword(targetUserId, password);
+      return res.status(200).json({
+        success: true,
+        message: result.message,
+        data: {
+          temporaryPassword: result.temporaryPassword,
+          user: result.user,
+        },
+      });
+    } catch (error) {
+      return next(error);
+    }
+  }
 }
 
 export const adminController = new AdminController();
+

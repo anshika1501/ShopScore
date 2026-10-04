@@ -25,6 +25,8 @@ const envSchema = z.object({
     .default('postgresql://shopscore:shopscore_secret@localhost:5432/shopscore_dev?schema=public'),
   JWT_SECRET: z.string().default('test_jwt_secret_key_minimum_length_shopscore'),
   JWT_EXPIRES_IN: z.string().default('1d'),
+  INITIAL_ADMIN_EMAIL: z.string().email().default('admin@shopscore.com'),
+  INITIAL_ADMIN_PASSWORD: z.string().default('ChangeMe@123'),
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
 });
 

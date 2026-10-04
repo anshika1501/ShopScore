@@ -23,17 +23,21 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Seeding ShopScore database...');
 
+  // Admin credentials from environment variables (fallback to default)
+  const adminEmail = (process.env.INITIAL_ADMIN_EMAIL || 'admin@shopscore.com').trim().toLowerCase();
+  const adminPassword = process.env.INITIAL_ADMIN_PASSWORD || 'ChangeMe@123';
+
   // Hash seed passwords
-  const adminPasswordHash = await bcrypt.hash('Admin@12345', 10);
+  const adminPasswordHash = await bcrypt.hash(adminPassword, 10);
   const ownerPasswordHash = await bcrypt.hash('Owner@12345', 10);
   const userPasswordHash = await bcrypt.hash('User@12345', 10);
 
-  // 1. Seed Administrator User (Name between 20-60 characters)
+  // 1. Seed Administrator User (Preserves existing password on subsequent runs)
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@shopscore.com' },
-    update: {},
+    where: { email: adminEmail },
+    update: {}, // Empty update ensures idempotency: does not overwrite if already exists
     create: {
-      email: 'admin@shopscore.com',
+      email: adminEmail,
       name: 'ShopScore Administrator Lead',
       password: adminPasswordHash,
       role: Role.ADMIN,

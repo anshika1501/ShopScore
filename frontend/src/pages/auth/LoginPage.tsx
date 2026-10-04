@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Alert } from '../../components/common/Alert';
-import { Star, Mail, Lock, LogIn } from 'lucide-react';
+import { Star, Mail, Lock, LogIn, ShieldAlert, ArrowLeft } from 'lucide-react';
+
 
 export const LoginPage: React.FC = () => {
   const { login } = useAuth();
@@ -12,6 +13,11 @@ export const LoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showForgotModal, setShowForgotModal] = useState(false);
+
+  // Check if current entered email or context is an admin
+  // The Admin login interface must not display the Forgot Password link
+  const isAdminEmail = email.trim().toLowerCase() === 'admin@shopscore.com' || email.trim().toLowerCase().includes('admin');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,7 +92,19 @@ export const LoginPage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Password</label>
+              <div className="flex items-center justify-between">
+                <label className="block text-sm font-medium text-gray-700">Password</label>
+                {/* Admin must not have a Forgot Password option. Only show for non-admin email */}
+                {!isAdminEmail && (
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotModal(true)}
+                    className="text-xs font-medium text-green-600 hover:text-green-700 hover:underline transition"
+                  >
+                    Forgot Password?
+                  </button>
+                )}
+              </div>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                   <Lock className="w-5 h-5" />
@@ -120,7 +138,7 @@ export const LoginPage: React.FC = () => {
             <div className="grid grid-cols-3 gap-2">
               <button
                 type="button"
-                onClick={() => handleDemoFill('admin@shopscore.com', 'Admin@12345')}
+                onClick={() => handleDemoFill('admin@shopscore.com', 'ChangeMe@123')}
                 className="px-2 py-1.5 text-xs font-medium border border-purple-200 text-purple-700 bg-purple-50 hover:bg-purple-100 rounded text-center transition"
               >
                 Admin
@@ -150,6 +168,41 @@ export const LoginPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Forgot Password Information Dialog */}
+      {showForgotModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-gray-100 animate-in fade-in zoom-in duration-150">
+            <div className="flex items-start space-x-4">
+              <div className="p-3 bg-blue-50 text-blue-600 rounded-xl shrink-0">
+                <ShieldAlert className="w-6 h-6" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-gray-900 leading-6">Password Recovery</h3>
+                <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+                  Password recovery is managed by the administrator. Please contact the admin to reset your password.
+                </p>
+                <div className="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200 text-xs text-gray-500">
+                  <p className="font-medium text-gray-700 mb-1">Administrative Support Contact</p>
+                  <p>Email: <span className="font-mono text-purple-700">admin@shopscore.com</span></p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end pt-2">
+              <button
+                type="button"
+                onClick={() => setShowForgotModal(false)}
+                className="inline-flex items-center px-4 py-2 bg-gray-900 hover:bg-black text-white text-sm font-medium rounded-lg shadow-sm transition"
+              >
+                <ArrowLeft className="w-4 h-4 mr-1.5" />
+                Back to Login
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+

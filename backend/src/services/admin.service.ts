@@ -461,6 +461,48 @@ export class AdminService {
       },
     };
   }
+
+  /**
+   * Admin-controlled password reset for normal users and store owners.
+   * If custom password not provided, generates a secure random temporary password.
+   */
+  async resetUserPassword(targetUserId: string, customPassword?: string) {
+    const user = await prisma.user.findUnique({
+      where: { id: targetUserId },
+    });
+
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    // Determine temporary password
+    let temporaryPassword = customPassword;
+    if (!temporaryPassword) {
+      // Generate a compliant random password (8-16 chars, 1 uppercase, 1 special char)
+      const randomPart = Math.random().toString(36).substring(2, 8); // 6 chars
+      temporaryPassword = `Tmp@${randomPart.toUpperCase()}1`;
+    }
+
+    const saltRounds = 10;
+    const passwordHash = await bcrypt.hash(temporaryPassword, saltRounds);
+
+    await prisma.user.update({
+      where: { id: targetUserId },
+      data: { password: passwordHash },
+    });
+
+    return {
+      message: `Password for ${user.name} (${user.email}) has been reset successfully`,
+      temporaryPassword,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    };
+  }
 }
 
 export const adminService = new AdminService();
+

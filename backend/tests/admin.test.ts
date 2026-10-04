@@ -7,6 +7,7 @@ import { Role } from '@prisma/client';
 import {
   adminCreateUserSchema,
   adminCreateStoreSchema,
+  adminResetUserPasswordSchema,
   userListQuerySchema,
   storeListQuerySchema,
 } from '../src/validators/admin.validator';
@@ -118,6 +119,40 @@ describe('Admin Schemas and Authorization Tests', () => {
       assert.strictEqual(res.body.success, false);
     });
 
+    test('POST /api/admin/users/:id/reset-password without admin role returns 403 Forbidden', async () => {
+      const userToken = signToken({
+        id: 'regular-user-id',
+        email: 'user@example.com',
+        role: Role.USER,
+      });
+
+      const res = await request(app)
+        .post('/api/admin/users/target-user-id/reset-password')
+        .set('Authorization', `Bearer ${userToken}`)
+        .send({});
+
+      assert.strictEqual(res.status, 403);
+      assert.strictEqual(res.body.success, false);
+      assert.ok(res.body.message.includes('permission'));
+    });
+
+    test('POST /api/admin/users/:id/reset-password with STORE_OWNER token returns 403 Forbidden', async () => {
+      const ownerToken = signToken({
+        id: 'owner-user-id',
+        email: 'owner@example.com',
+        role: Role.STORE_OWNER,
+      });
+
+      const res = await request(app)
+        .post('/api/admin/users/target-user-id/reset-password')
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({});
+
+      assert.strictEqual(res.status, 403);
+      assert.strictEqual(res.body.success, false);
+      assert.ok(res.body.message.includes('permission'));
+    });
+
     test('DELETE /api/admin/users/:id fails when admin attempts to delete own account', async () => {
       const adminToken = signToken({
         id: 'logged-in-admin-id',
@@ -134,6 +169,28 @@ describe('Admin Schemas and Authorization Tests', () => {
       assert.ok(res.body.message.includes('cannot delete your own admin account'));
     });
   });
+
+  describe('Admin Reset Password Schema', () => {
+    test('should accept empty body for auto-generated temporary password', () => {
+      const result = adminResetUserPasswordSchema.safeParse({});
+      assert.strictEqual(result.success, true);
+    });
+
+    test('should accept valid custom password', () => {
+      const result = adminResetUserPasswordSchema.safeParse({
+        password: 'ValidPass@123',
+      });
+      assert.strictEqual(result.success, true);
+    });
+
+    test('should reject invalid custom password not meeting complexity', () => {
+      const result = adminResetUserPasswordSchema.safeParse({
+        password: 'weak',
+      });
+      assert.strictEqual(result.success, false);
+    });
+  });
+
 
   describe('Admin User Creation Schema', () => {
     test('should reject user creation with name under 2 chars', () => {

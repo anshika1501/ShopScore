@@ -9,6 +9,7 @@ import { ConfirmationModal } from '../../components/common/ConfirmationModal';
 import { CreateUserModal } from '../../components/admin/CreateUserModal';
 import { CreateStoreModal } from '../../components/admin/CreateStoreModal';
 import { UserDetailsModal } from '../../components/admin/UserDetailsModal';
+import { ResetPasswordModal } from '../../components/admin/ResetPasswordModal';
 import {
   Users,
   Store as StoreIcon,
@@ -18,6 +19,7 @@ import {
   Filter,
   Eye,
   Trash2,
+  KeyRound,
   ArrowUpDown,
   Building2,
 } from 'lucide-react';
@@ -64,10 +66,12 @@ export const AdminDashboardPage: React.FC = () => {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
-  // Deletion modals state
+  // Deletion & reset modals state
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [storeToDelete, setStoreToDelete] = useState<Store | null>(null);
+  const [userToResetPassword, setUserToResetPassword] = useState<User | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
+
 
   // Global loading and error
   const [loading, setLoading] = useState(true);
@@ -185,6 +189,18 @@ export const AdminDashboardPage: React.FC = () => {
       setActionLoading(false);
     }
   };
+
+  const handleResetPassword = async (userId: string, customPassword?: string) => {
+    setActionLoading(true);
+    try {
+      const res = await adminApi.resetUserPassword(userId, customPassword ? { password: customPassword } : undefined);
+      triggerToast(res.message || 'Password reset successfully.');
+      return res.data;
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
 
   return (
     <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
@@ -459,6 +475,14 @@ export const AdminDashboardPage: React.FC = () => {
                                 <Eye className="w-4 h-4 mr-1" />
                                 Details
                               </button>
+                              <button
+                                onClick={() => setUserToResetPassword(u)}
+                                className="inline-flex items-center text-xs font-semibold text-amber-600 hover:text-amber-800 p-1.5 hover:bg-amber-50 rounded-lg transition"
+                                title="Reset User Password"
+                              >
+                                <KeyRound className="w-4 h-4 mr-1" />
+                                Reset
+                              </button>
                               {u.id !== currentUser?.id && (
                                 <button
                                   onClick={() => setUserToDelete(u)}
@@ -701,6 +725,15 @@ export const AdminDashboardPage: React.FC = () => {
         loading={actionLoading}
         onConfirm={handleDeleteStore}
         onCancel={() => setStoreToDelete(null)}
+      />
+
+      {/* Admin Password Reset Modal */}
+      <ResetPasswordModal
+        isOpen={!!userToResetPassword}
+        user={userToResetPassword}
+        loading={actionLoading}
+        onClose={() => setUserToResetPassword(null)}
+        onReset={handleResetPassword}
       />
     </div>
   );

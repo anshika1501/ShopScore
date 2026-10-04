@@ -90,7 +90,13 @@ export const storeListQuerySchema = z.object({
   sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
 });
 
+export const adminResetUserPasswordSchema = z.object({
+  password: passwordValidation.optional(),
+});
+
 export type AdminCreateUserInput = z.infer<typeof adminCreateUserSchema>;
 export type AdminCreateStoreInput = z.infer<typeof adminCreateStoreSchema>;
+export type AdminResetUserPasswordInput = z.infer<typeof adminResetUserPasswordSchema>;
 export type UserListQueryInput = z.infer<typeof userListQuerySchema>;
 export type StoreListQueryInput = z.infer<typeof storeListQuerySchema>;
+

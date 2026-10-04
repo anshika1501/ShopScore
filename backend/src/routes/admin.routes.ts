@@ -6,6 +6,7 @@ import { validate, validateQuery } from '../middleware/validate';
 import {
   adminCreateUserSchema,
   adminCreateStoreSchema,
+  adminResetUserPasswordSchema,
   userListQuerySchema,
   storeListQuerySchema,
 } from '../validators/admin.validator';
@@ -21,6 +22,8 @@ router.get('/users', validateQuery(userListQuerySchema), adminController.getUser
 router.post('/users', validate(adminCreateUserSchema), adminController.createUser);
 router.get('/users/:id', adminController.getUserDetails);
 router.delete('/users/:id', adminController.deleteUser);
+router.post('/users/:id/reset-password', validate(adminResetUserPasswordSchema), adminController.resetUserPassword);
+
 
 router.get('/stores', validateQuery(storeListQuerySchema), adminController.getStores);
 router.post('/stores', validate(adminCreateStoreSchema), adminController.createStore);
