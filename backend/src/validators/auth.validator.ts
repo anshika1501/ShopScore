@@ -30,7 +30,9 @@ export const registerSchema = z.object({
   address: z
     .string()
     .trim()
-    .max(400, 'Address cannot exceed 400 characters')
+    .min(5, 'Address must be between 5 and 200 characters')
+    .max(200, 'Address must be between 5 and 200 characters')
+    .regex(/^[a-zA-Z0-9\s,.\-#/']+$/, 'Address contains invalid characters')
     .optional(),
 });
 

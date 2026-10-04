@@ -32,7 +32,9 @@ export const adminCreateUserSchema = z.object({
   address: z
     .string()
     .trim()
-    .max(400, 'Address cannot exceed 400 characters')
+    .min(5, 'Address must be between 5 and 200 characters')
+    .max(200, 'Address must be between 5 and 200 characters')
+    .regex(/^[a-zA-Z0-9\s,.\-#/']+$/, 'Address contains invalid characters')
     .optional(),
 });
 
@@ -40,8 +42,12 @@ export const adminCreateStoreSchema = z.object({
   name: z
     .string({ required_error: 'Store name is required' })
     .trim()
-    .min(20, 'Store name must be between 20 and 60 characters')
-    .max(60, 'Store name must be between 20 and 60 characters'),
+    .min(2, 'Store name must be between 2 and 100 characters')
+    .max(100, 'Store name must be between 2 and 100 characters')
+    .regex(
+      /^[a-zA-Z0-9\s\-'.&,!#]+$/,
+      'Store name contains invalid characters'
+    ),
   email: z
     .string({ required_error: 'Store email is required' })
     .trim()
@@ -50,8 +56,9 @@ export const adminCreateStoreSchema = z.object({
   address: z
     .string({ required_error: 'Store address is required' })
     .trim()
-    .min(1, 'Store address cannot be empty')
-    .max(400, 'Store address cannot exceed 400 characters'),
+    .min(5, 'Store address must be between 5 and 200 characters')
+    .max(200, 'Store address must be between 5 and 200 characters')
+    .regex(/^[a-zA-Z0-9\s,.\-#/']+$/, 'Store address contains invalid characters'),
   ownerId: z.string().uuid('Invalid owner ID format').optional().nullable(),
 });
 

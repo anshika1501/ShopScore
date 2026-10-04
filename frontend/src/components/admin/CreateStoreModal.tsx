@@ -30,22 +30,38 @@ export const CreateStoreModal: React.FC<CreateStoreModalProps> = ({
 
   if (!isOpen) return null;
 
-  const nameLen = formData.name.trim().length;
-  const isNameValid = nameLen >= 20 && nameLen <= 60;
-  const isAddressValid = formData.address.trim().length > 0 && formData.address.trim().length <= 400;
+  const nameTrimmed = formData.name.trim();
+  const nameLen = nameTrimmed.length;
+  const isNameFormatValid = /^[a-zA-Z0-9\s\-'.&,!#]+$/.test(nameTrimmed);
+  const isNameValid = nameLen >= 2 && nameLen <= 100 && (nameLen === 0 || isNameFormatValid);
+
+  const addressTrimmed = formData.address.trim();
+  const addressLen = addressTrimmed.length;
+  const isAddressFormatValid = /^[a-zA-Z0-9\s,.\-#/']+$/.test(addressTrimmed);
+  const isAddressValid = addressLen >= 5 && addressLen <= 200 && isAddressFormatValid;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setFieldErrors({});
 
-    if (!isNameValid) {
-      setError('Store name must be between 20 and 60 characters long.');
+    if (nameLen < 2 || nameLen > 100) {
+      setError('Store name must be between 2 and 100 characters long.');
       return;
     }
 
-    if (!isAddressValid) {
-      setError('Address is required and cannot exceed 400 characters.');
+    if (!isNameFormatValid) {
+      setError('Store name contains invalid characters.');
+      return;
+    }
+
+    if (addressLen < 5 || addressLen > 200) {
+      setError('Store address must be between 5 and 200 characters long.');
+      return;
+    }
+
+    if (!isAddressFormatValid) {
+      setError('Store address contains invalid characters.');
       return;
     }
 
@@ -101,8 +117,8 @@ export const CreateStoreModal: React.FC<CreateStoreModalProps> = ({
               <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 Store Name
               </label>
-              <span className={`text-xs ${isNameValid ? 'text-green-600' : 'text-gray-400'}`}>
-                {nameLen}/60 chars (min 20)
+              <span className={`text-xs ${isNameValid && nameLen > 0 ? 'text-green-600' : 'text-gray-400'}`}>
+                {nameLen}/100 chars (min 2)
               </span>
             </div>
             <input
@@ -110,7 +126,7 @@ export const CreateStoreModal: React.FC<CreateStoreModalProps> = ({
               required
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="e.g. Downtown Prime Electronics Hub"
+              placeholder="e.g. Prime Electronics"
               className="block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-purple-500 focus:border-purple-500"
             />
           </div>
@@ -151,9 +167,14 @@ export const CreateStoreModal: React.FC<CreateStoreModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
-              Store Physical Address
-            </label>
+            <div className="flex justify-between items-center mb-1">
+              <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                Store Physical Address
+              </label>
+              <span className={`text-xs ${isAddressValid ? 'text-green-600' : 'text-gray-400'}`}>
+                {addressLen}/200 chars (min 5)
+              </span>
+            </div>
             <textarea
               rows={3}
               required

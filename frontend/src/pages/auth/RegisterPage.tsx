@@ -30,8 +30,10 @@ export const RegisterPage: React.FC = () => {
   const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(formData.password);
   const isPasswordValid = passwordLength >= 8 && passwordLength <= 16 && hasUppercase && hasSpecial;
 
-  const addressLength = formData.address.length;
-  const isAddressValid = addressLength <= 400;
+  const addressTrimmed = formData.address.trim();
+  const addressLength = addressTrimmed.length;
+  const isAddressFormatValid = addressLength === 0 || /^[a-zA-Z0-9\s,.\-#/']+$/.test(addressTrimmed);
+  const isAddressValid = (addressLength === 0 || (addressLength >= 5 && addressLength <= 200)) && isAddressFormatValid;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,8 +56,13 @@ export const RegisterPage: React.FC = () => {
       return;
     }
 
-    if (!isAddressValid) {
-      setError('Address cannot exceed 400 characters.');
+    if (addressLength > 0 && (addressLength < 5 || addressLength > 200)) {
+      setError('Address must be between 5 and 200 characters long.');
+      return;
+    }
+
+    if (!isAddressFormatValid) {
+      setError('Address contains invalid characters.');
       return;
     }
 
@@ -196,7 +203,7 @@ export const RegisterPage: React.FC = () => {
               <div className="flex justify-between items-center">
                 <label className="block text-sm font-medium text-gray-700">Address (Optional)</label>
                 <span className={`text-xs ${isAddressValid ? 'text-gray-400' : 'text-red-500'}`}>
-                  {addressLength}/400 max
+                  {addressLength}/200 max {addressLength > 0 && addressLength < 5 ? '(min 5)' : ''}
                 </span>
               </div>
               <div className="mt-1 relative rounded-md shadow-sm">

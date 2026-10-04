@@ -216,20 +216,47 @@ describe('Admin Schemas and Authorization Tests', () => {
   });
 
   describe('Admin Store Creation Schema', () => {
-    test('should reject store with name under 20 chars', () => {
+    test('should reject store with name under 2 chars', () => {
       const result = adminCreateStoreSchema.safeParse({
-        name: 'Short Store',
+        name: 'A',
         email: 'store@example.com',
         address: '123 Market St',
       });
       assert.strictEqual(result.success, false);
     });
 
-    test('should accept valid store creation payload', () => {
+    test('should accept valid store creation with short name (e.g. 2 chars or 11 chars)', () => {
       const result = adminCreateStoreSchema.safeParse({
-        name: 'Downtown Super Electronics Department',
+        name: 'Short Store',
+        email: 'store@example.com',
+        address: '123 Market St',
+      });
+      assert.strictEqual(result.success, true);
+    });
+
+    test('should reject store name longer than 100 chars', () => {
+      const result = adminCreateStoreSchema.safeParse({
+        name: 'A'.repeat(101),
+        email: 'store@example.com',
+        address: '123 Market St',
+      });
+      assert.strictEqual(result.success, false);
+    });
+
+    test('should reject store address under 5 chars', () => {
+      const result = adminCreateStoreSchema.safeParse({
+        name: 'Valid Store',
+        email: 'store@example.com',
+        address: '123',
+      });
+      assert.strictEqual(result.success, false);
+    });
+
+    test('should accept valid store creation payload with business name and address', () => {
+      const result = adminCreateStoreSchema.safeParse({
+        name: "Trader Joe's & Co.",
         email: 'contact@superstore.com',
-        address: '123 Tech Park Avenue, Central District',
+        address: '123 Tech Park Avenue, Suite #400, Central District',
         ownerId: '123e4567-e89b-12d3-a456-426614174000',
       });
       assert.strictEqual(result.success, true);

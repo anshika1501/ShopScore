@@ -38,7 +38,9 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClos
   const isPassValid = isLengthValid && hasUpper && hasSpecial;
 
   const addressTrimmed = formData.address.trim();
-  const isAddressValid = addressTrimmed.length <= 400;
+  const addressLen = addressTrimmed.length;
+  const isAddressFormatValid = addressLen === 0 || /^[a-zA-Z0-9\s,.\-#/']+$/.test(addressTrimmed);
+  const isAddressValid = (addressLen === 0 || (addressLen >= 5 && addressLen <= 200)) && isAddressFormatValid;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,8 +64,10 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClos
       if (!hasSpecial) missing.push('at least 1 special character');
       newFieldErrors.password = `Password requires: ${missing.join(', ')}.`;
     }
-    if (!isAddressValid) {
-      newFieldErrors.address = 'Address cannot exceed 400 characters.';
+    if (addressLen > 0 && (addressLen < 5 || addressLen > 200)) {
+      newFieldErrors.address = 'Address must be between 5 and 200 characters long.';
+    } else if (!isAddressFormatValid) {
+      newFieldErrors.address = 'Address contains invalid characters.';
     }
 
     if (Object.keys(newFieldErrors).length > 0) {
@@ -310,10 +314,10 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClos
               </label>
               <span
                 className={`text-xs ${
-                  addressTrimmed.length > 400 ? 'text-red-600 font-medium' : 'text-gray-400'
+                  addressLen > 200 || (addressLen > 0 && addressLen < 5) ? 'text-red-600 font-medium' : 'text-gray-400'
                 }`}
               >
-                {addressTrimmed.length}/400 max
+                {addressLen}/200 max {addressLen > 0 && addressLen < 5 ? '(min 5)' : ''}
               </span>
             </div>
             <textarea
@@ -331,7 +335,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClos
               }}
               placeholder="Enter physical address"
               className={`block w-full px-3 py-2 border rounded-lg text-sm focus:ring-purple-500 focus:border-purple-500 ${
-                addressTrimmed.length > 400 ? 'border-red-400 bg-red-50/20' : 'border-gray-300'
+                addressLen > 200 || (addressLen > 0 && addressLen < 5) ? 'border-red-400 bg-red-50/20' : 'border-gray-300'
               }`}
             />
             {fieldErrors.address && (
@@ -349,7 +353,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClos
             </button>
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !isAddressValid}
               className="flex-1 flex justify-center items-center py-2 px-4 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium shadow-sm transition disabled:opacity-50"
             >
               <Check className="w-4 h-4 mr-1.5" />

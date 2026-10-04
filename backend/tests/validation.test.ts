@@ -107,25 +107,45 @@ describe('Auth Validation Schemas', () => {
     });
   });
 
-  describe('Address Validation (max 400 chars)', () => {
-    test('should reject address exceeding 400 characters', () => {
+  describe('Address Validation (5-200 characters, allowed address characters)', () => {
+    test('should reject address shorter than 5 characters', () => {
       const result = registerSchema.safeParse({
         name: 'Valid Name Exactly Twenty Two Chars',
         email: 'test@example.com',
         password: 'SecurePassword@1',
-        address: 'x'.repeat(401),
+        address: '123',
       });
       assert.strictEqual(result.success, false);
     });
 
-    test('should accept valid address up to 400 characters', () => {
+    test('should reject address exceeding 200 characters', () => {
       const result = registerSchema.safeParse({
         name: 'Valid Name Exactly Twenty Two Chars',
         email: 'test@example.com',
         password: 'SecurePassword@1',
-        address: '123 Main Street, Suite 500, Tech City',
+        address: 'x'.repeat(201),
+      });
+      assert.strictEqual(result.success, false);
+    });
+
+    test('should accept valid address between 5 and 200 characters', () => {
+      const result = registerSchema.safeParse({
+        name: 'Valid Name Exactly Twenty Two Chars',
+        email: 'test@example.com',
+        password: 'SecurePassword@1',
+        address: '123 Main Street, Suite #500, Tech City - 400001',
       });
       assert.strictEqual(result.success, true);
+    });
+
+    test('should reject address with disallowed characters', () => {
+      const result = registerSchema.safeParse({
+        name: 'Valid Name Exactly Twenty Two Chars',
+        email: 'test@example.com',
+        password: 'SecurePassword@1',
+        address: '<script>alert(1)</script>',
+      });
+      assert.strictEqual(result.success, false);
     });
   });
 
