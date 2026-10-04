@@ -1,6 +1,6 @@
 # ShopScore - Development Roadmap & Task Tracker
 
-This file tracks the stage-by-stage implementation of the ShopScore store rating platform as specified in `AGENTS.md`.
+This file tracks the stage-by-stage implementation of the ShopScore store rating platform.
 
 ---
 
@@ -70,8 +70,8 @@ This file tracks the stage-by-stage implementation of the ShopScore store rating
   - [x] Build Store Owner Dashboard showing owned store(s) average ratings and customer rating inspection table with reviewer details
   - [x] Commit Stage 8 changes
 
-- [ ] **Stage 9: End-to-End Verification & Final Polish**
-  - [ ] Run full test suite across auth, roles, ratings, and store owner data isolation
-  - [ ] Verify production build for backend and frontend
-  - [ ] Finalize documentation and verify setup steps from scratch
-  - [ ] Commit Stage 9 changes
+- [x] **Stage 9: End-to-End Verification & Final Polish**
+  - [x] Run full test suite across auth, roles, ratings, and store owner data isolation (41/41 passing)
+  - [x] Verify production build for backend (`tsc` passed with 0 errors) and frontend (`vite build` passed)
+  - [x] Finalize documentation with WSL + Docker workflow, seeded account credentials, and API specifications
+  - [x] Commit Stage 9 changes
