@@ -52,6 +52,7 @@ export class RatingService {
         storeId,
         totalRatings: count,
         overallRating,
+        averageRating: overallRating,
       },
     };
   }

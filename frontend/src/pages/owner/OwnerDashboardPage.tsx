@@ -129,10 +129,10 @@ export const OwnerDashboardPage: React.FC = () => {
                     <p className="text-xs text-gray-500 mt-1 truncate">{store.address}</p>
 
                     <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
-                      {store.overallRating !== null ? (
+                      {(store.overallRating ?? store.averageRating) != null ? (
                         <div className="flex items-center space-x-1.5">
                           <Star className="w-4 h-4 fill-yellow-400 text-yellow-500" />
-                          <span className="text-sm font-bold text-gray-900">{store.overallRating}</span>
+                          <span className="text-sm font-bold text-gray-900">{store.overallRating ?? store.averageRating}</span>
                           <span className="text-xs text-gray-400">({store.totalRatings} reviews)</span>
                         </div>
                       ) : (
@@ -166,7 +166,9 @@ export const OwnerDashboardPage: React.FC = () => {
                     <div>
                       <p className="text-xs text-gray-400 uppercase font-semibold">Average Score</p>
                       <p className="text-lg font-extrabold text-gray-900">
-                        {selectedStore.overallRating !== null ? `${selectedStore.overallRating} / 5` : 'Not Rated'}
+                        {(selectedStore.overallRating ?? selectedStore.averageRating) != null
+                          ? `${selectedStore.overallRating ?? selectedStore.averageRating} / 5`
+                          : 'Not Rated'}
                       </p>
                     </div>
                   </div>

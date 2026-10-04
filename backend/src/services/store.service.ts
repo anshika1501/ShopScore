@@ -71,6 +71,7 @@ export class StoreService {
         createdAt: s.createdAt,
         totalRatings: count,
         overallRating, // null if no ratings
+        averageRating: overallRating,
         myRating,      // null if unauthenticated or not yet rated
       };
     });
@@ -126,6 +127,7 @@ export class StoreService {
       createdAt: store.createdAt,
       totalRatings: count,
       overallRating,
+      averageRating: overallRating,
       myRating,
     };
   }

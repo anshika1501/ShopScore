@@ -167,7 +167,7 @@ export class AdminService {
       storeDetails = user.ownedStores.map((store) => {
         const count = store.ratings.length;
         const sum = store.ratings.reduce((acc, curr) => acc + curr.rating, 0);
-        const averageRating = count > 0 ? Number((sum / count).toFixed(2)) : null;
+        const overallRating = count > 0 ? Number((sum / count).toFixed(2)) : null;
 
         return {
           id: store.id,
@@ -176,7 +176,8 @@ export class AdminService {
           address: store.address,
           createdAt: store.createdAt,
           totalRatings: count,
-          averageRating, // null represents "Not rated"
+          overallRating,
+          averageRating: overallRating, // null represents "Not rated"
         };
       });
     }
@@ -235,6 +236,7 @@ export class AdminService {
       address: store.address,
       createdAt: store.createdAt,
       owner: store.owner,
+      overallRating: null,
       averageRating: null,
       totalRatings: 0,
     };
@@ -295,7 +297,7 @@ export class AdminService {
     const formattedStores = stores.map((s) => {
       const count = s.ratings.length;
       const sum = s.ratings.reduce((acc, curr) => acc + curr.rating, 0);
-      const averageRating = count > 0 ? Number((sum / count).toFixed(2)) : null;
+      const overallRating = count > 0 ? Number((sum / count).toFixed(2)) : null;
 
       return {
         id: s.id,
@@ -305,7 +307,8 @@ export class AdminService {
         createdAt: s.createdAt,
         owner: s.owner,
         totalRatings: count,
-        averageRating,
+        overallRating,
+        averageRating: overallRating,
       };
     });
 

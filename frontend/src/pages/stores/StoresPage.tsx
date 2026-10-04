@@ -186,7 +186,8 @@ export const StoresPage: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {stores.map((store) => {
-            const hasOverallRating = store.overallRating !== null;
+            const overallScore = store.overallRating ?? store.averageRating;
+            const hasOverallRating = overallScore != null;
             const hasMyRating = store.myRating !== null && store.myRating !== undefined;
 
             return (
@@ -206,8 +207,8 @@ export const StoresPage: React.FC = () => {
                   <div className="flex items-center space-x-2 mb-4">
                     {hasOverallRating ? (
                       <div className="flex items-center space-x-2 bg-yellow-50 px-2.5 py-1 rounded-lg border border-yellow-200">
-                        <StarRating value={store.overallRating} size="sm" />
-                        <span className="text-sm font-bold text-yellow-900">{store.overallRating}</span>
+                        <StarRating value={overallScore} size="sm" />
+                        <span className="text-sm font-bold text-yellow-900">{overallScore}</span>
                         <span className="text-xs text-gray-500 font-medium">
                           ({store.totalRatings} {store.totalRatings === 1 ? 'rating' : 'ratings'})
                         </span>

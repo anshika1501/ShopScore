@@ -123,10 +123,10 @@ export const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ userId, isOp
                           <p className="text-xs text-gray-500 truncate">{store.address}</p>
                         </div>
                         <div className="text-right">
-                          {store.averageRating !== null ? (
+                          {(store.overallRating ?? store.averageRating) != null ? (
                             <div className="flex items-center text-xs font-bold text-yellow-800 bg-yellow-50 px-2 py-0.5 rounded border border-yellow-200">
                               <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-500 mr-1" />
-                              <span>{store.averageRating}</span>
+                              <span>{store.overallRating ?? store.averageRating}</span>
                               <span className="text-[10px] text-gray-500 ml-1">({store.totalRatings})</span>
                             </div>
                           ) : (

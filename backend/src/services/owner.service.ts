@@ -20,7 +20,7 @@ export class OwnerService {
     return stores.map((s) => {
       const count = s.ratings.length;
       const sum = s.ratings.reduce((acc, curr) => acc + curr.rating, 0);
-      const averageRating = count > 0 ? Number((sum / count).toFixed(2)) : null;
+      const overallRating = count > 0 ? Number((sum / count).toFixed(2)) : null;
 
       return {
         id: s.id,
@@ -29,7 +29,8 @@ export class OwnerService {
         address: s.address,
         createdAt: s.createdAt,
         totalRatings: count,
-        averageRating,
+        overallRating,
+        averageRating: overallRating,
       };
     });
   }

@@ -21,6 +21,7 @@ export interface Store {
     email: string;
   } | null;
   overallRating: number | null;
+  averageRating?: number | null;
   totalRatings: number;
   myRating?: number | null;
 }

@@ -300,7 +300,9 @@ export const AdminDashboardPage: React.FC = () => {
                           <p className="text-xs text-gray-500">{s.address}</p>
                         </div>
                         <span className="text-xs font-bold text-yellow-700 bg-yellow-50 px-2 py-1 rounded border border-yellow-200">
-                          {s.overallRating ? `★ ${s.overallRating}` : 'Not rated'}
+                          {(s.overallRating ?? s.averageRating) != null
+                            ? `★ ${s.overallRating ?? s.averageRating}`
+                            : 'Not rated'}
                         </span>
                       </div>
                     ))}
@@ -524,10 +526,10 @@ export const AdminDashboardPage: React.FC = () => {
                             )}
                           </td>
                           <td className="px-6 py-4">
-                            {s.overallRating !== null ? (
+                            {(s.overallRating ?? s.averageRating) != null ? (
                               <span className="inline-flex items-center text-xs font-bold text-yellow-800 bg-yellow-50 px-2 py-1 rounded border border-yellow-200">
                                 <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-500 mr-1" />
-                                {s.overallRating} ({s.totalRatings})
+                                {s.overallRating ?? s.averageRating} ({s.totalRatings})
                               </span>
                             ) : (
                               <span className="text-xs text-gray-400 font-medium">Not rated</span>
