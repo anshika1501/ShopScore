@@ -43,19 +43,16 @@ git clone <repository-url> ShopScore
 cd ShopScore
 ```
 
-### 2. Configure Environment Files
+### 2. Configure Environment (Single Root .env)
 
-Copy the provided environment templates:
+All settings (PostgreSQL, Express API, Prisma, JWT, CORS) are unified in a single root `.env` file:
 
 ```bash
-# 1. Project Root (Docker Compose PostgreSQL settings)
+# Copy the global template to .env in project root:
 cp .env.example .env
-
-# 2. Backend (Express API & Prisma connection settings)
-cp backend/.env.example backend/.env
 ```
 
-> **Security Note**: Never commit `.env` files. Both are ignored in `.gitignore`.
+> **Security Note**: Never commit `.env` files. Root `.env` is ignored in `.gitignore`.
 
 ---
 
@@ -76,42 +73,44 @@ docker compose ps
 
 ---
 
-### 4. Setup Backend, Run Migrations & Seed Data
+### 4. Install Dependencies & Initialize Database
 
-Navigate to the `backend` folder, install packages, and initialize the database:
+From the project root, install all monorepo dependencies using `pnpm`:
 
 ```bash
-cd backend
-npm install
+# Install workspace dependencies (root, backend, frontend)
+pnpm install
 
 # Verify database connection to container
-npm run db:check
+pnpm db:check
 
 # Apply Prisma migrations
-npx prisma migrate deploy
+pnpm prisma:migrate
 
 # Populate initial Admin, Store Owner, demo users, stores, and ratings
-npm run seed
-```
-
-Start the backend development server:
-
-```bash
-npm run dev
-# Server listening on http://localhost:5000
+pnpm seed
 ```
 
 ---
 
-### 5. Setup & Run Frontend
+### 5. Running the Application
 
-In a separate WSL terminal window:
+You can spin up both frontend and backend concurrently, or run them individually:
 
+#### Option A: Run Both Concurrently (Recommended)
 ```bash
-cd frontend
-npm install
-npm run dev
-# Vite dev server running on http://localhost:5173
+pnpm dev
+```
+- **Backend API**: `http://localhost:5000`
+- **Frontend App**: `http://localhost:5173`
+
+#### Option B: Run Individually
+```bash
+# Run backend only (port 5000)
+pnpm dev:backend
+
+# Run frontend only (port 5173)
+pnpm dev:frontend
 ```
 
 Open your browser and navigate to **`http://localhost:5173`**.

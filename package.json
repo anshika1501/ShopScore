@@ -1,0 +1,22 @@
+{
+  "name": "shopscore",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ShopScore - Full-stack Store Rating and Review Platform",
+  "scripts": {
+    "dev": "concurrently -n \"backend,frontend\" -c \"blue,green\" \"pnpm run dev:backend\" \"pnpm run dev:frontend\"",
+    "dev:backend": "pnpm --filter shopscore-backend dev",
+    "dev:frontend": "pnpm --filter shopscore-frontend dev",
+    "build": "pnpm --filter shopscore-backend build && pnpm --filter shopscore-frontend build",
+    "db:check": "pnpm --filter shopscore-backend db:check",
+    "prisma:generate": "pnpm --filter shopscore-backend prisma:generate",
+    "prisma:migrate": "pnpm --filter shopscore-backend prisma:migrate",
+    "prisma:studio": "pnpm --filter shopscore-backend prisma:studio",
+    "seed": "pnpm --filter shopscore-backend seed",
+    "test": "pnpm --filter shopscore-backend test"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "dotenv-cli": "^8.0.0"
+  }
+}
