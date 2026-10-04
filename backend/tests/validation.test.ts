@@ -16,8 +16,9 @@ describe('Auth Validation Schemas', () => {
       }
     });
 
-    test('should accept valid names between 2 and 60 characters including Ayaan Ansari', () => {
+    test('should accept valid names between 2 and 60 characters including Anshika Priya', () => {
       const validNames = [
+        'Anshika Priya',
         'Ayaan Ansari',
         'Al',
         "O'Connor",
@@ -36,7 +37,7 @@ describe('Auth Validation Schemas', () => {
 
     test('should reject names containing invalid characters like numbers or symbols', () => {
       const result = registerSchema.safeParse({
-        name: 'Ayaan Ansari 123',
+        name: 'Anshika Priya 123',
         email: 'test@example.com',
         password: 'ValidPassword@123',
       });

@@ -170,7 +170,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClos
                   });
                 }
               }}
-              placeholder="e.g. Ayaan Ansari"
+              placeholder="e.g. Anshika Priya"
               className={`block w-full px-3 py-2 border rounded-lg text-sm focus:ring-purple-500 focus:border-purple-500 ${
                 formData.name.length > 0 && !isNameValid
                   ? 'border-amber-400 bg-amber-50/20'

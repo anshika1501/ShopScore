@@ -129,7 +129,7 @@ export const RegisterPage: React.FC = () => {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="e.g. Ayaan Ansari"
+                  placeholder="e.g. Anshika Priya"
                   className={`block w-full pl-10 pr-3 py-2.5 border rounded-lg text-sm ${
                     formData.name && !isNameValid
                       ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
