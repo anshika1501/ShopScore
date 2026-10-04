@@ -26,24 +26,46 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClos
   if (!isOpen) return null;
 
   // Validation
-  const nameLen = formData.name.trim().length;
+  const nameTrimmed = formData.name.trim();
+  const nameLen = nameTrimmed.length;
   const isNameValid = nameLen >= 20 && nameLen <= 60;
+
   const passLen = formData.password.length;
+  const isLengthValid = passLen >= 8 && passLen <= 16;
   const hasUpper = /[A-Z]/.test(formData.password);
   const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(formData.password);
-  const isPassValid = passLen >= 8 && passLen <= 16 && hasUpper && hasSpecial;
+  const isPassValid = isLengthValid && hasUpper && hasSpecial;
+
+  const addressTrimmed = formData.address.trim();
+  const isAddressValid = addressTrimmed.length <= 400;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setFieldErrors({});
 
+    const newFieldErrors: Record<string, string> = {};
+
     if (!isNameValid) {
-      setError('Name must be between 20 and 60 characters.');
-      return;
+      newFieldErrors.name = 'Full name must be between 20 and 60 characters long.';
+    }
+    if (!formData.email.trim()) {
+      newFieldErrors.email = 'Email address is required.';
     }
     if (!isPassValid) {
-      setError('Password must satisfy all complexity requirements.');
+      const missing: string[] = [];
+      if (!isLengthValid) missing.push('8–16 characters');
+      if (!hasUpper) missing.push('at least 1 uppercase letter');
+      if (!hasSpecial) missing.push('at least 1 special character');
+      newFieldErrors.password = `Password requires: ${missing.join(', ')}.`;
+    }
+    if (!isAddressValid) {
+      newFieldErrors.address = 'Address cannot exceed 400 characters.';
+    }
+
+    if (Object.keys(newFieldErrors).length > 0) {
+      setFieldErrors(newFieldErrors);
+      setError('Please resolve all validation errors before proceeding.');
       return;
     }
 
@@ -51,11 +73,11 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClos
 
     try {
       await adminApi.createUser({
-        name: formData.name.trim(),
+        name: nameTrimmed,
         email: formData.email.trim(),
         password: formData.password,
         role: formData.role,
-        address: formData.address.trim() || undefined,
+        address: addressTrimmed || undefined,
       });
 
       onSuccess();
@@ -115,18 +137,45 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClos
               <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 Full Name
               </label>
-              <span className={`text-xs ${isNameValid ? 'text-green-600' : 'text-gray-400'}`}>
-                {nameLen}/60 chars (min 20)
+              <span
+                className={`text-xs ${
+                  formData.name.length === 0
+                    ? 'text-gray-400'
+                    : isNameValid
+                    ? 'text-green-600 font-medium'
+                    : 'text-amber-600 font-medium'
+                }`}
+              >
+                {nameLen}/60 chars {isNameValid ? '✓' : '(min 20)'}
               </span>
             </div>
             <input
               type="text"
               required
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) => {
+                setFormData({ ...formData, name: e.target.value });
+                if (fieldErrors.name) {
+                  setFieldErrors((prev) => {
+                    const copy = { ...prev };
+                    delete copy.name;
+                    return copy;
+                  });
+                }
+              }}
               placeholder="e.g. Jonathan Alexander Miller"
-              className="block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-purple-500 focus:border-purple-500"
+              className={`block w-full px-3 py-2 border rounded-lg text-sm focus:ring-purple-500 focus:border-purple-500 ${
+                formData.name.length > 0 && !isNameValid
+                  ? 'border-amber-400 bg-amber-50/20'
+                  : 'border-gray-300'
+              }`}
             />
+            <p className="mt-1 text-xs text-gray-500">
+              Must be between 20 and 60 characters long.
+            </p>
+            {fieldErrors.name && (
+              <p className="mt-1 text-xs text-red-600 font-medium">{fieldErrors.name}</p>
+            )}
           </div>
 
           <div>
@@ -137,40 +186,154 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClos
               type="email"
               required
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              onChange={(e) => {
+                setFormData({ ...formData, email: e.target.value });
+                if (fieldErrors.email) {
+                  setFieldErrors((prev) => {
+                    const copy = { ...prev };
+                    delete copy.email;
+                    return copy;
+                  });
+                }
+              }}
               placeholder="user@example.com"
               className="block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-purple-500 focus:border-purple-500"
             />
+            {fieldErrors.email && (
+              <p className="mt-1 text-xs text-red-600 font-medium">{fieldErrors.email}</p>
+            )}
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
-              Initial Password
-            </label>
+            <div className="flex justify-between items-center mb-1">
+              <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                Initial Password
+              </label>
+              <span
+                className={`text-xs ${
+                  formData.password.length === 0
+                    ? 'text-gray-400'
+                    : isPassValid
+                    ? 'text-green-600 font-medium'
+                    : 'text-amber-600 font-medium'
+                }`}
+              >
+                {passLen} chars
+              </span>
+            </div>
             <input
               type="password"
               required
               value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              onChange={(e) => {
+                setFormData({ ...formData, password: e.target.value });
+                if (fieldErrors.password) {
+                  setFieldErrors((prev) => {
+                    const copy = { ...prev };
+                    delete copy.password;
+                    return copy;
+                  });
+                }
+              }}
               placeholder="••••••••"
-              className="block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-purple-500 focus:border-purple-500"
+              className={`block w-full px-3 py-2 border rounded-lg text-sm focus:ring-purple-500 focus:border-purple-500 ${
+                formData.password.length > 0 && !isPassValid
+                  ? 'border-amber-400 bg-amber-50/20'
+                  : 'border-gray-300'
+              }`}
             />
-            <p className="mt-1 text-xs text-gray-500">
-              8–16 characters, $\ge 1$ uppercase letter, $\ge 1$ special character.
-            </p>
+
+            {/* Real-time password criteria list */}
+            <div className="mt-2.5 p-2.5 bg-gray-50 rounded-lg border border-gray-150 space-y-1">
+              <p className="text-[11px] font-semibold text-gray-600 uppercase tracking-wide">
+                Password Requirements:
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-xs">
+                <span
+                  className={`flex items-center gap-1.5 ${
+                    isLengthValid ? 'text-green-600 font-medium' : 'text-gray-500'
+                  }`}
+                >
+                  <span
+                    className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[10px] ${
+                      isLengthValid ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-500'
+                    }`}
+                  >
+                    ✓
+                  </span>
+                  8–16 characters ({passLen})
+                </span>
+
+                <span
+                  className={`flex items-center gap-1.5 ${
+                    hasUpper ? 'text-green-600 font-medium' : 'text-gray-500'
+                  }`}
+                >
+                  <span
+                    className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[10px] ${
+                      hasUpper ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-500'
+                    }`}
+                  >
+                    ✓
+                  </span>
+                  At least 1 uppercase letter
+                </span>
+
+                <span
+                  className={`flex items-center gap-1.5 sm:col-span-2 ${
+                    hasSpecial ? 'text-green-600 font-medium' : 'text-gray-500'
+                  }`}
+                >
+                  <span
+                    className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[10px] ${
+                      hasSpecial ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-500'
+                    }`}
+                  >
+                    ✓
+                  </span>
+                  At least 1 special character (!@#$%^&*...)
+                </span>
+              </div>
+            </div>
+            {fieldErrors.password && (
+              <p className="mt-1 text-xs text-red-600 font-medium">{fieldErrors.password}</p>
+            )}
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
-              Address (Optional, max 400 chars)
-            </label>
+            <div className="flex justify-between items-center mb-1">
+              <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                Address (Optional)
+              </label>
+              <span
+                className={`text-xs ${
+                  addressTrimmed.length > 400 ? 'text-red-600 font-medium' : 'text-gray-400'
+                }`}
+              >
+                {addressTrimmed.length}/400 max
+              </span>
+            </div>
             <textarea
               rows={2}
               value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+              onChange={(e) => {
+                setFormData({ ...formData, address: e.target.value });
+                if (fieldErrors.address) {
+                  setFieldErrors((prev) => {
+                    const copy = { ...prev };
+                    delete copy.address;
+                    return copy;
+                  });
+                }
+              }}
               placeholder="Enter physical address"
-              className="block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-purple-500 focus:border-purple-500"
+              className={`block w-full px-3 py-2 border rounded-lg text-sm focus:ring-purple-500 focus:border-purple-500 ${
+                addressTrimmed.length > 400 ? 'border-red-400 bg-red-50/20' : 'border-gray-300'
+              }`}
             />
+            {fieldErrors.address && (
+              <p className="mt-1 text-xs text-red-600 font-medium">{fieldErrors.address}</p>
+            )}
           </div>
 
           <div className="flex gap-3 pt-3">
@@ -183,7 +346,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClos
             </button>
             <button
               type="submit"
-              disabled={loading || !isNameValid || !isPassValid}
+              disabled={loading}
               className="flex-1 flex justify-center items-center py-2 px-4 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium shadow-sm transition disabled:opacity-50"
             >
               <Check className="w-4 h-4 mr-1.5" />
