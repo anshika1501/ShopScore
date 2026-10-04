@@ -5,6 +5,9 @@ import cookieParser from 'cookie-parser';
 import { env } from './config/env';
 import authRoutes from './routes/auth.routes';
 import adminRoutes from './routes/admin.routes';
+import storeRoutes from './routes/store.routes';
+import ratingRoutes from './routes/rating.routes';
+import ownerRoutes from './routes/owner.routes';
 import { errorHandler } from './middleware/errorHandler';
 import { NotFoundError } from './utils/errors';
 
@@ -35,6 +38,9 @@ export const createApp = (): Application => {
   // API Routes
   app.use('/api/auth', authRoutes);
   app.use('/api/admin', adminRoutes);
+  app.use('/api/stores', storeRoutes);
+  app.use('/api/ratings', ratingRoutes);
+  app.use('/api/owner', ownerRoutes);
 
   // 404 Handler
   app.use((_req: Request, _res: Response, next: NextFunction) => {

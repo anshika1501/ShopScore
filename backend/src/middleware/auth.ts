@@ -26,6 +26,30 @@ export const requireAuth = (req: Request, _res: Response, next: NextFunction) =>
   }
 };
 
+export const optionalAuth = (req: Request, _res: Response, next: NextFunction) => {
+  let token: string | undefined;
+
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.split(' ')[1];
+  } else if (req.cookies && req.cookies.token) {
+    token = req.cookies.token;
+  }
+
+  if (!token) {
+    return next();
+  }
+
+  try {
+    const decoded = verifyToken(token);
+    req.user = decoded;
+  } catch (error) {
+    // Ignore invalid tokens in optional auth
+  }
+
+  return next();
+};
+
 export const requireRole = (...allowedRoles: Role[]) => {
   return (req: Request, _res: Response, next: NextFunction) => {
     if (!req.user) {

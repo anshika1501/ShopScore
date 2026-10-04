@@ -40,12 +40,12 @@ This file tracks the stage-by-stage implementation of the ShopScore store rating
   - [x] Add automated tests for Admin authorization guards, schemas, and query filters (27 total tests passing)
   - [x] Commit Stage 4 changes
 
-- [ ] **Stage 5: Store Browsing, Rating & Store Owner APIs**
-  - [ ] Implement Public/User Store Listing (`/api/stores`) with name/address search, sorting, and rating aggregates
-  - [ ] Implement User Rating endpoints (`/api/ratings`): create or update (upsert) 1-5 rating per user-store
-  - [ ] Implement Store Owner APIs (`/api/owner/stores`, `/api/owner/ratings`) with strict store data isolation
-  - [ ] Add tests for rating boundaries (1-5), duplicate rating updates, and store-owner isolation
-  - [ ] Commit Stage 5 changes
+- [x] **Stage 5: Store Browsing, Rating & Store Owner APIs**
+  - [x] Implement Public/User Store Listing (`/api/stores`) with name/address search, sorting, and rating aggregates
+  - [x] Implement User Rating endpoints (`/api/ratings`): create or update (upsert) 1-5 rating per user-store
+  - [x] Implement Store Owner APIs (`/api/owner/stores`, `/api/owner/stores/:storeId/ratings`) with strict store data isolation
+  - [x] Add automated tests for rating boundaries (1-5), duplicate rating updates, and store-owner isolation (41 total tests passing)
+  - [x] Commit Stage 5 changes
 
 - [ ] **Stage 6: Frontend Foundation & Shared Authentication UI**
   - [ ] Initialize React + Vite frontend with Tailwind CSS and React Router
