@@ -20,7 +20,7 @@ describe('API Foundation & Health', () => {
 
   test('POST /api/auth/register with invalid data returns 400 with field details', async () => {
     const res = await request(app).post('/api/auth/register').send({
-      name: 'Short',
+      name: 'A',
       email: 'not-an-email',
       password: 'weak',
     });

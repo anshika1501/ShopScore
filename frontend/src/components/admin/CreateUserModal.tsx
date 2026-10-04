@@ -28,7 +28,8 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClos
   // Validation
   const nameTrimmed = formData.name.trim();
   const nameLen = nameTrimmed.length;
-  const isNameValid = nameLen >= 20 && nameLen <= 60;
+  const isNameFormatValid = /^[a-zA-Z\s\-']+$/.test(nameTrimmed);
+  const isNameValid = nameLen >= 2 && nameLen <= 60 && isNameFormatValid;
 
   const passLen = formData.password.length;
   const isLengthValid = passLen >= 8 && passLen <= 16;
@@ -46,8 +47,10 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClos
 
     const newFieldErrors: Record<string, string> = {};
 
-    if (!isNameValid) {
-      newFieldErrors.name = 'Full name must be between 20 and 60 characters long.';
+    if (nameLen < 2 || nameLen > 60) {
+      newFieldErrors.name = 'Full name must be between 2 and 60 characters long.';
+    } else if (!isNameFormatValid) {
+      newFieldErrors.name = 'Full name can only contain letters, spaces, hyphens, and apostrophes.';
     }
     if (!formData.email.trim()) {
       newFieldErrors.email = 'Email address is required.';
@@ -146,7 +149,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClos
                     : 'text-amber-600 font-medium'
                 }`}
               >
-                {nameLen}/60 chars {isNameValid ? '✓' : '(min 20)'}
+                {nameLen}/60 chars {isNameValid ? '✓' : '(min 2)'}
               </span>
             </div>
             <input
@@ -163,7 +166,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClos
                   });
                 }
               }}
-              placeholder="e.g. Jonathan Alexander Miller"
+              placeholder="e.g. Ayaan Ansari"
               className={`block w-full px-3 py-2 border rounded-lg text-sm focus:ring-purple-500 focus:border-purple-500 ${
                 formData.name.length > 0 && !isNameValid
                   ? 'border-amber-400 bg-amber-50/20'
@@ -171,7 +174,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClos
               }`}
             />
             <p className="mt-1 text-xs text-gray-500">
-              Must be between 20 and 60 characters long.
+              Must be between 2 and 60 characters long. Letters, spaces, hyphens, and apostrophes allowed.
             </p>
             {fieldErrors.name && (
               <p className="mt-1 text-xs text-red-600 font-medium">{fieldErrors.name}</p>

@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import { registerSchema, loginSchema, changePasswordSchema } from '../src/validators/auth.validator';
 
 describe('Auth Validation Schemas', () => {
-  describe('Name Validation (20-60 characters inclusive)', () => {
-    test('should reject names shorter than 20 characters', () => {
+  describe('Name Validation (2-60 characters inclusive)', () => {
+    test('should reject names shorter than 2 characters', () => {
       const result = registerSchema.safeParse({
-        name: 'Short Name',
+        name: 'A',
         email: 'test@example.com',
         password: 'ValidPassword@123',
       });
@@ -16,13 +16,34 @@ describe('Auth Validation Schemas', () => {
       }
     });
 
-    test('should accept names between 20 and 60 characters', () => {
+    test('should accept valid names between 2 and 60 characters including Ayaan Ansari', () => {
+      const validNames = [
+        'Ayaan Ansari',
+        'Al',
+        "O'Connor",
+        'Jean-Luc',
+        'Mary Jane Watson',
+      ];
+      for (const name of validNames) {
+        const result = registerSchema.safeParse({
+          name,
+          email: 'test@example.com',
+          password: 'ValidPass@123',
+        });
+        assert.strictEqual(result.success, true, `Expected "${name}" to be valid`);
+      }
+    });
+
+    test('should reject names containing invalid characters like numbers or symbols', () => {
       const result = registerSchema.safeParse({
-        name: 'This Is A Valid Twenty Chars Name',
+        name: 'Ayaan Ansari 123',
         email: 'test@example.com',
-        password: 'ValidPass@123',
+        password: 'ValidPassword@123',
       });
-      assert.strictEqual(result.success, true);
+      assert.strictEqual(result.success, false);
+      if (!result.success) {
+        assert.ok(result.error.errors.some((e) => e.path.includes('name')));
+      }
     });
 
     test('should reject names longer than 60 characters', () => {

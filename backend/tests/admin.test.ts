@@ -75,9 +75,9 @@ describe('Admin Schemas and Authorization Tests', () => {
   });
 
   describe('Admin User Creation Schema', () => {
-    test('should reject user creation with name under 20 chars', () => {
+    test('should reject user creation with name under 2 chars', () => {
       const result = adminCreateUserSchema.safeParse({
-        name: 'Short Name',
+        name: 'A',
         email: 'newadmin@example.com',
         password: 'Password@123',
         role: Role.ADMIN,

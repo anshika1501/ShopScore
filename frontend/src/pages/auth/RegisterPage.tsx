@@ -20,8 +20,10 @@ export const RegisterPage: React.FC = () => {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   // Live validation helpers
-  const nameLength = formData.name.trim().length;
-  const isNameValid = nameLength >= 20 && nameLength <= 60;
+  const nameTrimmed = formData.name.trim();
+  const nameLength = nameTrimmed.length;
+  const isNameFormatValid = /^[a-zA-Z\s\-']+$/.test(nameTrimmed);
+  const isNameValid = nameLength >= 2 && nameLength <= 60 && isNameFormatValid;
 
   const passwordLength = formData.password.length;
   const hasUppercase = /[A-Z]/.test(formData.password);
@@ -37,8 +39,13 @@ export const RegisterPage: React.FC = () => {
     setFieldErrors({});
 
     // Client-side guard before sending
-    if (!isNameValid) {
-      setError('Name must be between 20 and 60 characters long.');
+    if (nameLength < 2 || nameLength > 60) {
+      setError('Name must be between 2 and 60 characters long.');
+      return;
+    }
+
+    if (!isNameFormatValid) {
+      setError('Name can only contain letters, spaces, hyphens, and apostrophes.');
       return;
     }
 
@@ -103,7 +110,7 @@ export const RegisterPage: React.FC = () => {
               <div className="flex justify-between items-center">
                 <label className="block text-sm font-medium text-gray-700">Full Name</label>
                 <span className={`text-xs ${isNameValid ? 'text-green-600' : 'text-gray-400'}`}>
-                  {nameLength}/60 chars (min 20)
+                  {nameLength}/60 chars (min 2)
                 </span>
               </div>
               <div className="mt-1 relative rounded-md shadow-sm">
@@ -115,7 +122,7 @@ export const RegisterPage: React.FC = () => {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="e.g. Christopher Alexander Davis"
+                  placeholder="e.g. Ayaan Ansari"
                   className={`block w-full pl-10 pr-3 py-2.5 border rounded-lg text-sm ${
                     formData.name && !isNameValid
                       ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
@@ -124,7 +131,7 @@ export const RegisterPage: React.FC = () => {
                 />
               </div>
               <p className="mt-1 text-xs text-gray-500">
-                Must be between 20 and 60 characters inclusive.
+                Must be between 2 and 60 characters inclusive. Letters, spaces, hyphens, and apostrophes allowed.
               </p>
             </div>
 

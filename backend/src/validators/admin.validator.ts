@@ -16,8 +16,12 @@ export const adminCreateUserSchema = z.object({
   name: z
     .string({ required_error: 'Name is required' })
     .trim()
-    .min(20, 'Name must be between 20 and 60 characters')
-    .max(60, 'Name must be between 20 and 60 characters'),
+    .min(2, 'Name must be between 2 and 60 characters')
+    .max(60, 'Name must be between 2 and 60 characters')
+    .regex(
+      /^[a-zA-Z\s\-']+$/,
+      'Name can only contain letters, spaces, hyphens, and apostrophes'
+    ),
   email: z
     .string({ required_error: 'Email is required' })
     .trim()
