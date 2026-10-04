@@ -4,6 +4,7 @@ import { Store, RatingReview, Pagination } from '../../types';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import { Alert } from '../../components/common/Alert';
 import { StarRating } from '../../components/stores/StarRating';
+import { formatDate } from '../../utils/formatDate';
 import { Store as StoreIcon, Star, User, MapPin, Mail, Calendar, MessageSquare, ChevronRight } from 'lucide-react';
 
 export const OwnerDashboardPage: React.FC = () => {
@@ -48,7 +49,7 @@ export const OwnerDashboardPage: React.FC = () => {
       setRatings(res.data.ratings);
       setPagination(res.data.pagination);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to load reviews for this store.');
+      setError(err.response?.data?.message || 'Failed to load ratings for this store.');
     } finally {
       setLoadingRatings(false);
     }
@@ -119,11 +120,11 @@ export const OwnerDashboardPage: React.FC = () => {
                         : 'bg-white border-gray-200 hover:border-gray-300 shadow-xs'
                     }`}
                   >
-                    <div className="flex justify-between items-start">
-                      <h3 className="font-bold text-gray-900 text-sm leading-snug truncate max-w-[200px]">
+                    <div className="flex justify-between items-start gap-2">
+                      <h3 className="font-bold text-gray-900 text-sm leading-snug truncate flex-1 min-w-0">
                         {store.name}
                       </h3>
-                      <ChevronRight className={`w-4 h-4 ${isSelected ? 'text-blue-600' : 'text-gray-400'}`} />
+                      <ChevronRight className={`w-4 h-4 shrink-0 mt-0.5 ${isSelected ? 'text-blue-600' : 'text-gray-400'}`} />
                     </div>
 
                     <p className="text-xs text-gray-500 mt-1 truncate">{store.address}</p>
@@ -133,7 +134,9 @@ export const OwnerDashboardPage: React.FC = () => {
                         <div className="flex items-center space-x-1.5">
                           <Star className="w-4 h-4 fill-yellow-400 text-yellow-500" />
                           <span className="text-sm font-bold text-gray-900">{store.overallRating ?? store.averageRating}</span>
-                          <span className="text-xs text-gray-400">({store.totalRatings} reviews)</span>
+                          <span className="text-xs text-gray-400">
+                            ({store.totalRatings} {store.totalRatings === 1 ? 'rating' : 'ratings'})
+                          </span>
                         </div>
                       ) : (
                         <span className="text-xs text-gray-400 font-medium">No ratings yet</span>
@@ -174,18 +177,18 @@ export const OwnerDashboardPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Reviews List */}
+                {/* Customer Ratings List */}
                 <div className="p-6">
                   <div className="flex justify-between items-center mb-6">
                     <h3 className="text-sm font-bold text-gray-900 flex items-center">
                       <MessageSquare className="w-4 h-4 text-blue-600 mr-2" />
-                      Customer Submissions ({pagination.total})
+                      Customer Ratings ({pagination.total})
                     </h3>
                   </div>
 
                   {loadingRatings ? (
                     <div className="py-12">
-                      <LoadingSpinner message="Loading customer reviews..." />
+                      <LoadingSpinner message="Loading customer ratings..." />
                     </div>
                   ) : ratings.length === 0 ? (
                     <div className="text-center py-12 border border-dashed rounded-xl border-gray-200">
@@ -203,14 +206,14 @@ export const OwnerDashboardPage: React.FC = () => {
                           className="p-4 rounded-xl border border-gray-200 bg-white hover:border-gray-300 transition-colors"
                         >
                           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
-                            <div className="flex items-center space-x-2">
-                              <div className="p-1.5 bg-gray-100 text-gray-600 rounded-full">
+                            <div className="flex items-center space-x-2 min-w-0">
+                              <div className="p-1.5 bg-gray-100 text-gray-600 rounded-full shrink-0">
                                 <User className="w-4 h-4" />
                               </div>
-                              <span className="font-semibold text-sm text-gray-900">{rev.user.name}</span>
+                              <span className="font-semibold text-sm text-gray-900 truncate">{rev.user.name}</span>
                             </div>
 
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center space-x-2 shrink-0">
                               <StarRating value={rev.rating} size="sm" />
                               <span className="text-sm font-bold text-yellow-900 bg-yellow-50 px-2 py-0.5 rounded border border-yellow-200">
                                 {rev.rating} / 5
@@ -218,20 +221,22 @@ export const OwnerDashboardPage: React.FC = () => {
                             </div>
                           </div>
 
-                          <div className="pt-2 border-t border-gray-100 flex flex-wrap gap-4 text-xs text-gray-500">
-                            <div className="flex items-center space-x-1.5">
-                              <Mail className="w-3.5 h-3.5 text-gray-400" />
-                              <span>{rev.user.email}</span>
-                            </div>
-                            {rev.user.address && (
-                              <div className="flex items-center space-x-1.5">
-                                <MapPin className="w-3.5 h-3.5 text-gray-400" />
-                                <span className="truncate max-w-xs">{rev.user.address}</span>
+                          <div className="pt-2 border-t border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-gray-500">
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 min-w-0">
+                              <div className="flex items-center space-x-1.5 min-w-0">
+                                <Mail className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                                <span className="truncate max-w-[200px] sm:max-w-xs">{rev.user.email}</span>
                               </div>
-                            )}
-                            <div className="flex items-center space-x-1.5 ml-auto">
-                              <Calendar className="w-3.5 h-3.5 text-gray-400" />
-                              <span>{new Date(rev.createdAt).toLocaleDateString()}</span>
+                              {rev.user.address && (
+                                <div className="flex items-center space-x-1.5 min-w-0">
+                                  <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                                  <span className="truncate max-w-[200px] sm:max-w-xs">{rev.user.address}</span>
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex items-center space-x-1.5 shrink-0 text-gray-400 sm:self-center">
+                              <Calendar className="w-3.5 h-3.5" />
+                              <span>{formatDate(rev.createdAt)}</span>
                             </div>
                           </div>
                         </div>

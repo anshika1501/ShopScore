@@ -28,7 +28,7 @@ This application is built for development in **VS Code using WSL (Ubuntu)** with
 
 1. **Windows 10/11 with WSL 2** (Ubuntu 22.04 or 24.04 recommended)
 2. **Docker Desktop** installed on Windows with **WSL 2 backend integration** enabled for your Ubuntu distro
-3. **Node.js** (v20+ or v22+) & **npm** installed inside WSL
+3. **Node.js** (v20+ or v22+) & **pnpm** (installed via `npm install -g pnpm`)
 
 ---
 
@@ -119,7 +119,7 @@ Open your browser and navigate to **`http://localhost:5173`**.
 
 ## Pre-Seeded Demo Accounts
 
-The database seed script (`npm run seed`) provisions accounts for all 3 roles:
+The database seed script (`pnpm seed`) provisions accounts for all 3 roles:
 
 | Role | Email | Password | Access / Capabilities |
 |---|---|---|---|

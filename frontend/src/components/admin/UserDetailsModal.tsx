@@ -3,6 +3,7 @@ import { adminApi } from '../../services/api';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { Alert } from '../common/Alert';
 import { X, User, Store, Star, MapPin, Mail, Calendar } from 'lucide-react';
+import { formatDate } from '../../utils/formatDate';
 
 interface UserDetailsModalProps {
   userId: string | null;
@@ -94,7 +95,7 @@ export const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ userId, isOp
                 </div>
                 <div className="flex items-center space-x-2">
                   <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                  <span>Joined: {new Date(user.createdAt).toLocaleDateString()}</span>
+                  <span>Joined: {formatDate(user.createdAt)}</span>
                 </div>
               </div>
             </div>
@@ -127,7 +128,9 @@ export const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ userId, isOp
                             <div className="flex items-center text-xs font-bold text-yellow-800 bg-yellow-50 px-2 py-0.5 rounded border border-yellow-200">
                               <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-500 mr-1" />
                               <span>{store.overallRating ?? store.averageRating}</span>
-                              <span className="text-[10px] text-gray-500 ml-1">({store.totalRatings})</span>
+                              <span className="text-[10px] text-gray-500 ml-1">
+                                ({store.totalRatings} {store.totalRatings === 1 ? 'rating' : 'ratings'})
+                              </span>
                             </div>
                           ) : (
                             <span className="text-[11px] text-gray-400 font-medium">Not rated</span>

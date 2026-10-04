@@ -70,7 +70,7 @@ export const AdminDashboardPage: React.FC = () => {
       const res = await adminApi.getDashboard();
       setStats(res.data);
     } catch (err: any) {
-      console.error('Failed to load stats:', err);
+      setError(err.response?.data?.message || 'Failed to load platform statistics.');
     }
   };
 
@@ -111,8 +111,8 @@ export const AdminDashboardPage: React.FC = () => {
     try {
       const res = await adminApi.getUsers({ role: 'STORE_OWNER', limit: 100 });
       setStoreOwners(res.data.users);
-    } catch (err) {
-      console.error('Failed to load store owners list', err);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to load store owners list.');
     }
   };
 
@@ -529,7 +529,7 @@ export const AdminDashboardPage: React.FC = () => {
                             {(s.overallRating ?? s.averageRating) != null ? (
                               <span className="inline-flex items-center text-xs font-bold text-yellow-800 bg-yellow-50 px-2 py-1 rounded border border-yellow-200">
                                 <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-500 mr-1" />
-                                {s.overallRating ?? s.averageRating} ({s.totalRatings})
+                                {s.overallRating ?? s.averageRating} ({s.totalRatings} {s.totalRatings === 1 ? 'rating' : 'ratings'})
                               </span>
                             ) : (
                               <span className="text-xs text-gray-400 font-medium">Not rated</span>

@@ -103,7 +103,7 @@ export const StoresPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <div className="max-w-7xl 2xl:max-w-[1536px] mx-auto py-8 px-4 sm:px-6 lg:px-8">
       {/* Page Title & Search Bar */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
         <div>
@@ -184,7 +184,7 @@ export const StoresPage: React.FC = () => {
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
           {stores.map((store) => {
             const overallScore = store.overallRating ?? store.averageRating;
             const hasOverallRating = overallScore != null;
