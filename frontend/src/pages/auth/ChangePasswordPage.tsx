@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Alert } from '../../components/common/Alert';
 import { KeyRound, Lock, Check, X } from 'lucide-react';
 
 export const ChangePasswordPage: React.FC = () => {
-  const { changePassword } = useAuth();
+  const { user, changePassword } = useAuth();
+  const navigate = useNavigate();
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -13,6 +15,19 @@ export const ChangePasswordPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const handleCancel = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else if (user?.role === 'ADMIN') {
+      navigate('/admin');
+    } else if (user?.role === 'STORE_OWNER') {
+      navigate('/owner');
+    } else {
+      navigate('/stores');
+    }
+  };
+
 
   // Validation
   const newPassLength = newPassword.length;
@@ -146,13 +161,23 @@ export const ChangePasswordPage: React.FC = () => {
             )}
           </div>
 
-          <button
-            type="submit"
-            disabled={loading || !isNewPassValid || !passwordsMatch}
-            className="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition disabled:opacity-50"
-          >
-            {loading ? 'Updating Password...' : 'Update Password'}
-          </button>
+          <div className="flex gap-3 pt-2">
+            <button
+              type="button"
+              disabled={loading}
+              onClick={handleCancel}
+              className="flex-1 py-2.5 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading || !isNewPassValid || !passwordsMatch}
+              className="flex-1 flex justify-center items-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition disabled:opacity-50"
+            >
+              {loading ? 'Updating Password...' : 'Update Password'}
+            </button>
+          </div>
         </form>
       </div>
     </div>
