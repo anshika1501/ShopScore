@@ -22,3 +22,25 @@ export const validate = (schema: AnyZodObject) => {
     }
   };
 };
+
+export const validateQuery = (schema: AnyZodObject) => {
+  return async (req: Request, _res: Response, next: NextFunction) => {
+    try {
+      const parsed = await schema.parseAsync(req.query);
+      (req as any).validatedQuery = parsed;
+      next();
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const fieldErrors: Record<string, string> = {};
+        error.errors.forEach((err) => {
+          const path = err.path.join('.');
+          if (!fieldErrors[path]) {
+            fieldErrors[path] = err.message;
+          }
+        });
+        return next(new BadRequestError('Invalid query parameters', fieldErrors));
+      }
+      return next(error);
+    }
+  };
+};

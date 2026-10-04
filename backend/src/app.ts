@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import { env } from './config/env';
 import authRoutes from './routes/auth.routes';
+import adminRoutes from './routes/admin.routes';
 import { errorHandler } from './middleware/errorHandler';
 import { NotFoundError } from './utils/errors';
 
@@ -33,6 +34,7 @@ export const createApp = (): Application => {
 
   // API Routes
   app.use('/api/auth', authRoutes);
+  app.use('/api/admin', adminRoutes);
 
   // 404 Handler
   app.use((_req: Request, _res: Response, next: NextFunction) => {

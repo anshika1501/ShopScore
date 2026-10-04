@@ -31,14 +31,14 @@ This file tracks the stage-by-stage implementation of the ShopScore store rating
   - [x] Add automated unit and integration tests (17 tests passing across validation, JWT, and API boundaries)
   - [x] Commit Stage 3 changes
 
-- [ ] **Stage 4: Admin Management APIs**
-  - [ ] Implement Admin Dashboard statistics endpoint (`/api/admin/dashboard`)
-  - [ ] Implement Admin User Management: list users with search, role filter, sorting, and pagination
-  - [ ] Implement Admin User Creation: create `ADMIN` and `STORE_OWNER` accounts
-  - [ ] Implement Admin Store Management: create store and associate with a `STORE_OWNER`
-  - [ ] Implement Admin User Details endpoint (including store rating summaries for store owners)
-  - [ ] Add tests for Admin authorization guards and listing filters
-  - [ ] Commit Stage 4 changes
+- [x] **Stage 4: Admin Management APIs**
+  - [x] Implement Admin Dashboard statistics endpoint (`/api/admin/dashboard`)
+  - [x] Implement Admin User Management: list users with search (name, email, address), role filter, whitelisted sorting, and pagination
+  - [x] Implement Admin User Creation: create `ADMIN`, `STORE_OWNER`, and `USER` accounts with validation
+  - [x] Implement Admin Store Management: create store and associate with a verified `STORE_OWNER`
+  - [x] Implement Admin User Details endpoint (`/api/admin/users/:id`), including store rating summaries for store owners
+  - [x] Add automated tests for Admin authorization guards, schemas, and query filters (27 total tests passing)
+  - [x] Commit Stage 4 changes
 
 - [ ] **Stage 5: Store Browsing, Rating & Store Owner APIs**
   - [ ] Implement Public/User Store Listing (`/api/stores`) with name/address search, sorting, and rating aggregates
