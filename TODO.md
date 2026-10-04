@@ -47,13 +47,13 @@ This file tracks the stage-by-stage implementation of the ShopScore store rating
   - [x] Add automated tests for rating boundaries (1-5), duplicate rating updates, and store-owner isolation (41 total tests passing)
   - [x] Commit Stage 5 changes
 
-- [ ] **Stage 6: Frontend Foundation & Shared Authentication UI**
-  - [ ] Initialize React + Vite frontend with Tailwind CSS and React Router
-  - [ ] Configure Axios API client with centralized error and auth handling
-  - [ ] Build shared Auth Context, route guards (`ProtectedRoute`, `RoleRoute`)
-  - [ ] Build shared navigation and responsive layout
-  - [ ] Build Login, Public Registration, and Change Password pages
-  - [ ] Commit Stage 6 changes
+- [x] **Stage 6: Frontend Foundation & Shared Authentication UI**
+  - [x] Initialize React + Vite frontend with Tailwind CSS and React Router
+  - [x] Configure Axios API client with centralized error and auth handling (`frontend/src/services/api.ts`)
+  - [x] Build shared Auth Context, route guards (`ProtectedRoute` with role redirection)
+  - [x] Build shared navigation and responsive layout with role badges and mobile support
+  - [x] Build Login, Public Registration (with real-time criteria validation), and Change Password pages
+  - [x] Commit Stage 6 changes
 
 - [ ] **Stage 7: Normal User Experience**
   - [ ] Build Store Discovery page with live search (name/address) and sorting
